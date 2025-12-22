@@ -1,0 +1,30 @@
+{
+   // Visit https://aka.ms/tsconfig to read more about this file
+   "compilerOptions": {
+
+      "module": "nodenext",
+      "moduleResolution": "nodenext",
+      "target": "esnext",
+      "types": [],
+
+      "sourceMap": true,
+      "declaration": true,
+      "declarationMap": true,
+
+      // Stricter Typechecking Options
+      "noUncheckedIndexedAccess": true,
+      "exactOptionalPropertyTypes": true,
+
+      "strict": true,
+      "jsx": "react-jsx",
+      "verbatimModuleSyntax": false,
+      "isolatedModules": true,
+      "noUncheckedSideEffectImports": true,
+      "moduleDetection": "force",
+      "skipLibCheck": true,
+
+      //Adicionados para fazer com que o modo de importação do express fique com funções de importações padrão para bibliotecas antigas e novas
+      "esModuleInterop": true,
+      "forceConsistentCasingInFileNames": true
+   }
+}

@@ -1,0 +1,29 @@
+{
+  "name": "cadastro_de_usuarios",
+  "version": "1.0.0",
+  "description": "Um servidor que faz o cadastro de usuarios de um aplicativo em kotlin",
+  "main": "index.ts",
+  "scripts": {
+    "test": ""
+  },
+  "author": "Renan Almeida de Araujo",
+  "license": "ISC",
+  "dependencies": {
+    "@types/express": "^4.17.25",
+    "express": "^5.2.1",
+    "ts-node-dev": "^2.0.0",
+    "tsc-init": "^2.1.0"
+  },
+  "devDependencies": {
+    "@types/jasmine": "^5.1.13",
+    "jasmine-core": "^5.13.0",
+    "karma": "^6.4.4",
+    "karma-chrome-launcher": "^3.2.0",
+    "karma-jasmine": "^5.1.0",
+    "karma-webpack": "^5.0.1",
+    "ts-loader": "^9.5.4",
+    "typescript": "^5.9.3",
+    "webpack": "^5.104.1",
+    "webpack-dev-server": "^5.2.2"
+  }
+}
