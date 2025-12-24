@@ -1,3 +1,4 @@
+import Tarefa, { DificuldadeTarefa, StatusTarefa} from "./Tarefa";
 
 export default class Usuario {
     #nomeUsuario: string;
@@ -16,6 +17,20 @@ export default class Usuario {
     get profissaoUsuario() {
         return this.#profissaoUsuario
     }
+    set mudarProfissaoUsuario(novaProfissão: string){
+        this.#profissaoUsuario = novaProfissão
+    }
+
+    #tarefasUsuario: Tarefa[] = [new Tarefa(
+        "Funcionalidades das contagens",
+        "Criar os eventos que vão ser disparados quando o usuario clicar no conteiner da contagem.",
+        StatusTarefa.EmProgresso,
+        DificuldadeTarefa.Medio
+    )]
+    get tarefasUsuario () {
+        return this.#tarefasUsuario
+    }
+
 
     constructor(nome: string, email: string, senha: string, profissao?: string) {
         this.#nomeUsuario = nome.toLowerCase();
@@ -33,7 +48,8 @@ export default class Usuario {
         return {
             nome: this.#nomeUsuario,
             email: this.#emailUsuario,
-            profissao: this.profissaoUsuario != undefined? this.#profissaoUsuario : "Sem profissão registrada" 
+            profissao: this.profissaoUsuario != undefined? this.#profissaoUsuario : "Sem profissão registrada" ,
+            tarefas: this.tarefasUsuario
         }
     }
 
@@ -44,6 +60,6 @@ export let listaUsuarios: Usuario[] = [
         "Renan Almieda de Araujo",
         "renan.almeida.arau@gmail.com",
         "Ren1805140114!",
-        "Engenheiro de software"
+        "Engenheiro de software",
     )
 ]
