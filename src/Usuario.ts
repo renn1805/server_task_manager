@@ -36,6 +36,9 @@ export default class Usuario {
         }
     }
 
+    compararSenha(senhaComparacao:String):Boolean{
+        if (this.senhaUsuario === senhaComparacao) {return true}else {return false}
+    }
 
 }
 

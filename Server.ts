@@ -29,7 +29,7 @@ app.post("/usuarios/criarUsuario", (req, res) => {
     if (!resultadoRequisicao.success) {
         return res.status(400).json({
             erro: "dados invalidos!",
-            detalhes: resultadoRequisicao.error.format()
+            detalhes: resultadoRequisicao.error
         })
     }
 
@@ -49,12 +49,25 @@ app.post("/usuarios/criarUsuario", (req, res) => {
 })
 
 
-app.delete("/usuarios/deletarUsuario", ( req, res) =>{
-    const emailUsuarioProcurado = req.query.email
+app.post("/usuarios/deletarUsuario", ( req, res) =>{
 
-    const indexUsurioExcluido = User.listaUsuarios.findIndex(usuario =>
-        usuario.emailUsuario == emailUsuarioProcurado
-    )
+    const requisicaoEsquema = z.object({
+        emailUsuarioProcurado: z.email(),
+        senhaUsuarioProcurado: z.string()
+    })
+
+    const requisicao = requisicaoEsquema.safeParse(req.body)
+
+    if (!requisicao.success){
+        return res.status(400).json({
+            erro: "dados invalidos!",
+            descricao: requisicao.error
+        })
+    }
+
+    const {emailUsuarioProcurado, senhaUsuarioProcurado} = requisicao.data
+
+    const indexUsurioExcluido = User.listaUsuarios.findIndex(usuario => usuario.emailUsuario == emailUsuarioProcurado && usuario.compararSenha(senhaUsuarioProcurado))
 
 
     if (indexUsurioExcluido != -1){
