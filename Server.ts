@@ -1,7 +1,11 @@
 import { app } from "./app"
 import * as z from "zod"
+
+//? Importação das classes usadas
 import Usuario, * as User from "./src/Usuario"
 import Tarefa from "./src/Tarefa"
+
+//? Iportação dos Enums usados
 import { StatusTarefa } from "./src/enum/EnumStatusTarefa"
 import { DificuldadeTarefa } from "./src/enum/EnumDificuldadeTarefa"
 
@@ -9,11 +13,12 @@ import { DificuldadeTarefa } from "./src/enum/EnumDificuldadeTarefa"
 const porta = 3000
 app.listen(porta, () => console.log("O servidor esta rodando"))
 
-
+//? Método para pegar todas os usuarios
 app.get("/usuarios", (req, res) => {
     res.send(User.listaUsuarios)
 })
 
+//? Método para criar usuario
 app.post("/usuarios/criarUsuario", (req, res) => {
 
     const reqEsquema = z.object(
@@ -36,6 +41,12 @@ app.post("/usuarios/criarUsuario", (req, res) => {
 
     const { nomeUsuario, emailUsuario, senhaUsuario, profissaoUsuario } = requisicao.data
 
+    const emailEmUso = User.listaUsuarios.find(usuarioJaCadastrado => usuarioJaCadastrado.emailUsuario === emailUsuario) instanceof Usuario
+
+    if (emailEmUso) {
+        return res.status(401).send("Email ja esta em uso!")
+    }
+
     const novoUsuario = new Usuario(
         nomeUsuario,
         emailUsuario,
@@ -49,7 +60,7 @@ app.post("/usuarios/criarUsuario", (req, res) => {
 
 })
 
-
+//? Método para deletar usuarios
 app.post("/usuarios/deletarUsuario", (req, res) => {
 
     const reqEsquema = z.object({
@@ -84,16 +95,17 @@ app.post("/usuarios/deletarUsuario", (req, res) => {
 })
 
 
-const reqEsquema = z.object({
-    idUsuario: z.int(),
-    nomeTarefa: z.string().max(50),
-    descricaoTarefa: z.string(),
-    statusTarefa: z.string<StatusTarefa>(),
-    dificuldadeTarefa: z.string<DificuldadeTarefa>()
 
-})
 
+//? Método para criar uma tarefa
 app.post("/usuario/criarTarefa", (req, res) => {
+    const reqEsquema = z.object({
+        idUsuario: z.number().int(),
+        nomeTarefa: z.string().max(50),
+        descricaoTarefa: z.string(),
+        statusTarefa: z.union([z.literal(0), z.literal(1), z.literal(2)]),
+        dificuldadeTarefa: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)])
+    })
 
     const requisicao = reqEsquema.safeParse(req.body)
 
@@ -106,14 +118,31 @@ app.post("/usuario/criarTarefa", (req, res) => {
 
     const { idUsuario, nomeTarefa, descricaoTarefa, statusTarefa, dificuldadeTarefa } = requisicao.data
 
+    const mapaDificuldade = {
+        0: DificuldadeTarefa.Indefinido,
+        1: DificuldadeTarefa.Facil,
+        2: DificuldadeTarefa.Medio,
+        3: DificuldadeTarefa.Dificil
+    }
+    const dificuldadeTarefaConvertido = mapaDificuldade[dificuldadeTarefa as keyof typeof mapaDificuldade] ?? DificuldadeTarefa.Indefinido
+
+    const mapaStatus = {
+        0: StatusTarefa.Pendente,
+        1: StatusTarefa.EmProgresso,
+        2: StatusTarefa.Finalizado
+    }
+    const statusTarefaConvertido = mapaStatus[statusTarefa as keyof typeof mapaStatus] ?? StatusTarefa.Pendente
+
+
     const usuarioRequerido = User.listaUsuarios.find(usuario => usuario.compararId(idUsuario))
 
     if (usuarioRequerido !== undefined) {
         usuarioRequerido.tarefasUsuario.push(new Tarefa(
+            usuarioRequerido.tarefasUsuario.length + 1,
             nomeTarefa,
             descricaoTarefa,
-            statusTarefa,
-            dificuldadeTarefa
+            statusTarefaConvertido,
+            dificuldadeTarefaConvertido
         ))
 
         return res.send("tarefa adicionada com sucesso")

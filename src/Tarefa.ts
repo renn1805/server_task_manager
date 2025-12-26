@@ -2,13 +2,7 @@ import { StatusTarefa } from "./enum/EnumStatusTarefa";
 import { DificuldadeTarefa } from "./enum/EnumDificuldadeTarefa";
 export default class Tarefa {
 
-    static #contadorId = 0
-
     #idTarefa: number
-    get idTarefa() {
-        return this.#idTarefa
-    }
-
 
     #nomeTarefa: string;
     get nomeTarefa() {
@@ -39,14 +33,13 @@ export default class Tarefa {
 
 
     constructor(
+        id: number,
         nome: string,
         descricao: string,
         status: StatusTarefa,
         dificuldade: DificuldadeTarefa
     ) {
-        Tarefa.#contadorId++ 
-
-        this.#idTarefa = Tarefa.#contadorId
+        this.#idTarefa = id
         this.#nomeTarefa = nome
         this.#descricaoTarefa = descricao
         this.#dificuldadeTarefa = dificuldade
@@ -57,7 +50,7 @@ export default class Tarefa {
     toJSON() {
 
         return {
-            id: this.#idTarefa,
+            idTarefa: this.#idTarefa,
             nomeTarefa: this.#nomeTarefa,
             descricaoTarefa: this.#descricaoTarefa,
             status: this.#statusAtualTarefa,

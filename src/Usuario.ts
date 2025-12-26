@@ -1,8 +1,5 @@
 import Tarefa from "./Tarefa";
 
-import { DificuldadeTarefa } from './enum/EnumDificuldadeTarefa'
-import { StatusTarefa } from "./enum/EnumStatusTarefa";
-
 export default class Usuario {
 
     static #contadorId = 1000
@@ -80,9 +77,9 @@ export default class Usuario {
 
 export let listaUsuarios: Usuario[] = [
     new Usuario(
-        "Renan Almieda de Araujo",
+        "Renan Almeida de Araujo",
         "renan.almeida.arau@gmail.com",
-        "Ren1805140114!",
+        "12345678",
         "Engenheiro de software",
     )
 ]

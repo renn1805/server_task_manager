@@ -1,5 +1,5 @@
 export enum StatusTarefa {
-    Pendente = 'pendente',
-    EmProgresso = 'em progresso',
-    Finalizado = 'finalizado'
+    Pendente = 'Pendente',
+    EmProgresso = 'Em Progresso',
+    Finalizado = 'Finalizado'
 }
