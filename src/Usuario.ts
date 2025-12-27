@@ -62,6 +62,14 @@ export default class Usuario {
         }
     }
 
+    compararEmail(emailComparacao: string): boolean {
+        if (this.#emailUsuario === emailComparacao) {
+            return true
+        } else {
+            return false
+        }
+    }
+
 
     toJSON() {
         return {
