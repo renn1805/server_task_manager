@@ -1,53 +1,34 @@
 import Task from "./Task";
+import { Users as PrismaUser } from '../generated/prisma/index.js'
 
 export default class User {
 
-    static #counterId = 1000
-    #id: number
+    #id: number;
     #name: string;
     #email: string;
     #password: string;
     #tasks: Task[] = []
     
     
-    constructor(name: string, email: string, password: string) {
-        User.#counterId++
-        
-        this.#id = User.#counterId
+    constructor(id: number, name: string, email: string, password: string) {
+        this.#id = id
         this.#name = name.toLowerCase();
         this.#email = email.toLowerCase();
         this.#password = password
     };
+
+    static fromPrisma (prismaUser: PrismaUser ): User {
+        return new User(
+            prismaUser.id,
+            prismaUser.name,
+            prismaUser.email,
+            prismaUser.password,
+        )
+    }
     
-    get id() {return this.#id}
     get name() {return this.#name}
     get email() {return this.#email}
     get tasks() {return this.#tasks}
-
-    matchesPassword(comparedPassword: string): boolean {
-        if (this.#password === comparedPassword) {
-            return true
-        } else {
-            return false
-        }
-    }
-
-    matchesId(comparedId: number): boolean {
-        if (this.#id === comparedId) {
-            return true
-        } else {
-            return false
-        }
-    }
-
-    matchesEmail(comparedEmail: string): boolean {
-        if (this.#email === comparedEmail) {
-            return true
-        } else {
-            return false
-        }
-    }
-
 
     toJSON() {
         return {
@@ -59,11 +40,3 @@ export default class User {
     }
 
 }
-
-export let Users: User[] = [
-    new User(
-        "Renan Almeida de Araujo",
-        "renan.almeida.arau@gmail.com",
-        "12345678"
-    )
-]
