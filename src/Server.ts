@@ -98,12 +98,12 @@ app.post("/users/delete", async (req, res) => {
 
 })
 
-app.post("/users/task", async (req, res) => {
+app.post("/users/tasks", async (req, res) => {
 
     try {
 
         const reqSchema = z.object({
-            id: z.number().int(),
+            creatorId: z.number().int(),
             title: z.string().max(50),
             description: z.string(),
             status: z.union([z.literal(0), z.literal(1), z.literal(2)]),
@@ -119,7 +119,7 @@ app.post("/users/task", async (req, res) => {
             })
         }
 
-        const { id, title, description, status, difficulty } = request.data
+        const { creatorId, title, description, status, difficulty } = request.data
 
         const difficultyMap = {
             0: TaskDifficulty.Undefined,
@@ -142,11 +142,44 @@ app.post("/users/task", async (req, res) => {
                 description: description.toLowerCase(),
                 difficulty: difficultyConverted,
                 status: taskStateConverted,
-                creatorId: id
+                creatorId: creatorId
             }
         })
 
         return res.status(201).end()
+
+    } catch (error) {
+        return res.status(500).send(error)
+    }
+})
+
+app.post("/users/tasks/delete", async (req, res) => {
+
+    try {
+        const reqSchema = z.object({
+            taskId: z.number().int(),
+            userId: z.number().int()
+        })
+
+        const request = reqSchema.safeParse(req.body)
+
+        if (!request.success) {
+            return res.status(400).json({
+                error: "Invalid data!",
+                description: request.error
+            })
+        }
+
+        const { taskId, userId } = request.data
+
+        await prisma.tasks.delete({
+            where: {
+                id: taskId,
+                creatorId: userId
+            }
+        })
+
+        return res.status(204).end()
 
     } catch (error) {
         return res.status(500).send(error)
