@@ -3,6 +3,7 @@ import * as z from "zod"
 
 import { TaskStatus } from "./enum/TaskStatus"
 import { TaskDifficulty } from "./enum/TaskDifficulty"
+import { hashPassword } from "./utils/BcryptFunctions"
 
 
 const port = 3000
@@ -47,9 +48,9 @@ app.post("/users", async (req, res) => {
 
         await prisma.users.create({
             data: {
-                name: name,
-                email: email,
-                password: password
+                name: name.toLowerCase(),
+                email: email.toLowerCase(),
+                password: await hashPassword(password)
             }
         })
 
@@ -84,8 +85,8 @@ app.post("/users/delete", async (req, res) => {
 
         const prismaUser = await prisma.users.delete({
             where: {
-                email: email,
-                password: password
+                email: email.toLowerCase(),
+                password: password.toLowerCase()
             }
         })
 
@@ -137,15 +138,15 @@ app.post("/users/task", async (req, res) => {
 
         await prisma.tasks.create({
             data: {
-                title: title,
-                description: description,
+                title: title.toLowerCase(),
+                description: description.toLowerCase(),
                 difficulty: difficultyConverted,
                 status: taskStateConverted,
                 creatorId: id
             }
         })
 
-        return res.status(201).end() 
+        return res.status(201).end()
 
     } catch (error) {
         return res.status(500).send(error)
