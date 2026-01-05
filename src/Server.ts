@@ -1,13 +1,8 @@
 import { app, prisma } from "./app"
 import * as z from "zod"
 
-import User, * as U from "./User"
-import Task from "./Task"
-
 import { TaskStatus } from "./enum/TaskStatus"
 import { TaskDifficulty } from "./enum/TaskDifficulty"
-import id from "zod/v4/locales/id.js"
-import { truncate } from "node:fs"
 
 
 const port = 3000
@@ -150,7 +145,7 @@ app.post("/users/task", async (req, res) => {
             }
         })
 
-        return res.status(201).end()
+        return res.status(201).end() 
 
     } catch (error) {
         return res.status(500).send(error)
