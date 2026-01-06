@@ -3,115 +3,16 @@ import * as z from "zod"
 
 import { TaskStatus } from "./enum/TaskStatus"
 import { TaskDifficulty } from "./enum/TaskDifficulty"
-import { comparePassword, hashPassword } from "./utils/BcryptFunctions"
+import routes from "./routes"
 
 
 const port = 3000
 app.listen(port, () => console.log("The server is running"))
 
-app.get("/users", async (req, res) => {
-    try {
 
-        const users = await prisma.users.findMany()
-        return res.status(200).send(users)
+app.use(routes)
 
-    } catch (error) {
-
-        return res.status(500).send(error)
-
-    }
-
-})
-
-app.post("/users", async (req, res) => {
-
-    try {
-
-        const reqSchema = z.object(
-            {
-                name: z.string(),
-                email: z.email(),
-                password: z.string().min(8),
-            }
-        )
-
-        const request = reqSchema.safeParse(req.body)
-
-        if (!request.success) {
-            return res.status(400).json({
-                error: "Invalid data",
-                description: request.error
-            })
-        }
-
-        const { name, email, password } = request.data
-
-        await prisma.users.create({
-            data: {
-                name: name.toLowerCase(),
-                email: email.toLowerCase(),
-                password: await hashPassword(password)
-            }
-        })
-
-        return res.status(201).end()
-
-
-    } catch (error) {
-        return res.status(500).send(error)
-    }
-
-})
-
-app.post("/users/delete", async (req, res) => {
-
-    try {
-
-        const reqSchema = z.object({
-            email: z.email(),
-            password: z.string()
-        })
-
-        const request = reqSchema.safeParse(req.body)
-
-        if (!request.success) {
-            return res.status(400).json({
-                error: "Invalid data",
-                description: request.error
-            })
-        }
-
-        const { email, password } = request.data
-
-        const user = await prisma.users.findUnique({
-            where: {
-                email: email.toLowerCase()
-            }
-        })
-
-        if (!user) {
-            return res.status(400).send("User not found!")
-        }
-
-        if (!(comparePassword(password, user!.password))) {
-            return res.status(400).send("Password not match!")
-        }
-
-        await prisma.users.delete({
-            where: {
-                email: email
-            }
-        })
-
-        return res.status(204).end()
-
-    } catch (error) {
-        return res.status(500).send(error)
-    }
-
-})
-
-app.post("/users/tasks", async (req, res) => {
+app.post("/tasks", async (req, res) => {
 
     try {
 
@@ -166,7 +67,7 @@ app.post("/users/tasks", async (req, res) => {
     }
 })
 
-app.post("/users/tasks/delete", async (req, res) => {
+app.post("/tasks/delete", async (req, res) => {
 
     try {
         const reqSchema = z.object({
