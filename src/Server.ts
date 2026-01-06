@@ -3,7 +3,7 @@ import * as z from "zod"
 
 import { TaskStatus } from "./enum/TaskStatus"
 import { TaskDifficulty } from "./enum/TaskDifficulty"
-import { hashPassword } from "./utils/BcryptFunctions"
+import { comparePassword, hashPassword } from "./utils/BcryptFunctions"
 
 
 const port = 3000
@@ -83,10 +83,23 @@ app.post("/users/delete", async (req, res) => {
 
         const { email, password } = request.data
 
-        const prismaUser = await prisma.users.delete({
+        const user = await prisma.users.findUnique({
             where: {
-                email: email.toLowerCase(),
-                password: password.toLowerCase()
+                email: email.toLowerCase()
+            }
+        })
+
+        if (!user) {
+            return res.status(400).send("User not found!")
+        }
+
+        if (!(comparePassword(password, user!.password))) {
+            return res.status(400).send("Password not match!")
+        }
+
+        await prisma.users.delete({
+            where: {
+                email: email
             }
         })
 
