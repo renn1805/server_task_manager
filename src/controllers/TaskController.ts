@@ -42,7 +42,7 @@ export default class TaskController {
                 2: TaskStatus.Finished
             }
             const taskStateConverted = stateMap[status as keyof typeof stateMap] ?? TaskStatus.Pending
-
+            
             await prisma.tasks.create({
                 data: {
                     title: title.toLowerCase(),

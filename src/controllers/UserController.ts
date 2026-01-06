@@ -33,6 +33,16 @@ export default class UserController {
             }
 
             const { name, email, password } = request.data
+            const emailAlreadyUsed = await prisma.users.findUnique({
+                where: {
+                    email: email
+                }
+            }) ? true : false
+
+            if (emailAlreadyUsed) {
+                return res.status(401).send("Email already used")
+            }
+
             await prisma.users.create({
                 data: {
                     name: name.toLowerCase(),

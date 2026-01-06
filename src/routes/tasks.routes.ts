@@ -4,11 +4,11 @@ import TaskController from "../controllers/TaskController";
 const tasksRoutes = Router()
 const taskController = new TaskController()
 
-tasksRoutes.post("/tasks", (req, res) => {
+tasksRoutes.post("/", (req, res) => {
     taskController.create(req, res)
 })
 
-tasksRoutes.post("/tasks/delete", (req, res) => {
+tasksRoutes.post("/delete", (req, res) => {
     taskController.delete(req, res)
 })
 
