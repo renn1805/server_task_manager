@@ -3,6 +3,7 @@ import { TaskStatus } from "../enum/TaskStatus"
 import { prisma } from "../app"
 import * as z from "zod"
 import { Request, Response } from "express"
+import { nanoid } from "nanoid"
 
 
 export default class TaskController {
@@ -10,7 +11,8 @@ export default class TaskController {
     async create(req: Request, res: Response) {
         try {
             const reqSchema = z.object({
-                creatorId: z.number().int(),
+                team: z.string(),
+                manager: z.string(),
                 title: z.string().max(50),
                 description: z.string(),
                 status: z.union([z.literal(0), z.literal(1), z.literal(2)]),
@@ -26,7 +28,7 @@ export default class TaskController {
                 })
             }
 
-            const { creatorId, title, description, status, difficulty } = request.data
+            const {team, manager, title, description, status, difficulty } = request.data
 
             const difficultyMap = {
                 0: TaskDifficulty.Undefined,
@@ -43,13 +45,15 @@ export default class TaskController {
             }
             const taskStateConverted = stateMap[status as keyof typeof stateMap] ?? TaskStatus.Pending
             
-            await prisma.tasks.create({
+            await prisma.task.create({
                 data: {
+                    id: nanoid(6),
                     title: title.toLowerCase(),
                     description: description.toLowerCase(),
                     difficulty: difficultyConverted,
                     status: taskStateConverted,
-                    creatorId: creatorId
+                    managerId: manager,
+                    teamId: team
                 }
             })
 
@@ -63,8 +67,8 @@ export default class TaskController {
     async delete(req: Request, res: Response) {
         try {
             const reqSchema = z.object({
-                taskId: z.number().int(),
-                userId: z.number().int()
+                taskId: z.string(),
+                userId: z.string()
             })
 
             const request = reqSchema.safeParse(req.body)
@@ -78,10 +82,10 @@ export default class TaskController {
 
             const { taskId, userId } = request.data
 
-            await prisma.tasks.delete({
+            await prisma.task.delete({
                 where: {
                     id: taskId,
-                    creatorId: userId
+                    managerId: userId
                 }
             })
 

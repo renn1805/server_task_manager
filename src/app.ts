@@ -1,7 +1,7 @@
 import express from "express"
 import cors from "cors"
 import { PrismaBetterSqlite3 } from '@prisma/adapter-better-sqlite3';
-import { PrismaClient } from '../generated/prisma/client';
+import { PrismaClient } from '../generated/prisma';
 import 'dotenv/config'
 
 const adapter = new PrismaBetterSqlite3({

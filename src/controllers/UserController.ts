@@ -2,13 +2,14 @@ import * as z from "zod"
 import { Request, Response } from "express"
 import { prisma } from "../app"
 import { hashPassword, comparePassword } from "../utils/BcryptFunctions"
+import { nanoid } from "nanoid"
 
 
 export default class UserController {
 
     async users(req: Request, res: Response) {
         try {
-            const users = await prisma.users.findMany()
+            const users = await prisma.user.findMany()
             return res.status(200).send(users)
         } catch (error) {
             return res.status(500).send(error)
@@ -22,8 +23,10 @@ export default class UserController {
                     name: z.string(),
                     email: z.email(),
                     password: z.string().min(8),
+                    position: z.string()
                 }
             )
+
             const request = reqSchema.safeParse(req.body)
             if (!request.success) {
                 return res.status(400).json({
@@ -32,22 +35,15 @@ export default class UserController {
                 })
             }
 
-            const { name, email, password } = request.data
-            const emailAlreadyUsed = await prisma.users.findUnique({
-                where: {
-                    email: email
-                }
-            }) ? true : false
-
-            if (emailAlreadyUsed) {
-                return res.status(401).send("Email already used")
-            }
-
-            await prisma.users.create({
+            const {position, name, email, password } = request.data
+            
+            await prisma.user.create({
                 data: {
+                    id: nanoid(11),
                     name: name.toLowerCase(),
                     email: email.toLowerCase(),
-                    password: await hashPassword(password)
+                    password: await hashPassword(password),
+                    position: position.toLowerCase()
                 }
             })
 
@@ -74,7 +70,7 @@ export default class UserController {
             }
 
             const { email, password } = request.data
-            const user = await prisma.users.findUnique({
+            const user = await prisma.user.findUnique({
                 where: {
                     email: email.toLowerCase()
                 }
@@ -85,7 +81,7 @@ export default class UserController {
             if (!(comparePassword(password, user!.password))) {
                 return res.status(400).send("Password not match!")
             }
-            await prisma.users.delete({
+            await prisma.user.delete({
                 where: {
                     email: email
                 }
