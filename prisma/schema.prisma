@@ -10,23 +10,141 @@ datasource db {
   provider = "sqlite"
 }
 
-
-model Users{
-  id Int @id @default(autoincrement())
-  name String
-  email String @unique
+model User {
+  id       String @id
+  name     String
+  email    String @unique
   password String
-  tasks Tasks[]
+  position String
+
+  //para aceitar a ser chave estrangeira
+  tasksManager Task[]
+
+  teams       TeamsMembers[]
+  managerTeam Team[]
+
+  workspaces        WorkspaceMember[]
+  managerWorkspaces Workspace[]
+
+  objectivesManager Objective[]
+
+  comments Comment[]
 }
 
-model Tasks {
-  id Int @id @default(autoincrement())
-  title String
+model Workspace {
+  id           String    @id
+  project_name String
+  description  String
+  createdAt    DateTime @default(now())
+  completedAt  DateTime? 
+
+  managerId String?
+  manager   User?  @relation(fields: [managerId], references: [id], onDelete: SetNull)
+
+  members WorkspaceMember[]
+
+  tasks      Task[]
+  objectives Objective[]
+}
+
+model WorkspaceMember {
+  id String @id
+
+  memberId String
+  member   User  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, workspaceId])
+}
+
+model Team {
+  id          String  @id
+  name        String
+  description String?
+
+  managerId String?
+  manager   User?          @relation(fields: [managerId], references: [id], onDelete: SetNull)
+  members   TeamsMembers[]
+
+  tasks      Task[]
+  objectives Objective[]
+}
+
+model TeamsMembers {
+  id String @id
+
+  memberId String
+  member   User  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+
+  teamId String
+  team   Team  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+
+  @@unique([memberId, teamId])
+}
+
+model Task {
+  id          String    @id
+  title       String
   description String
-  status String
-  difficulty String
+  status      String
+  difficulty  String
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
 
-  creatorId Int 
+  workspaceId String?
+  workspace   Workspace? @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
-  creator Users @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  objectiveId String?
+  objectives  Objective? @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
+
+  teamId String?
+  team   Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  parentId String?
+  parent   Task?  @relation("Subtasks", fields: [parentId], references: [id], onDelete: Cascade)
+  subtasks Task[] @relation("Subtasks")
+
+  comments Comment[]
+
+  managerId String?
+  manager   User?  @relation(fields: [managerId], references: [id], onDelete: SetNull)
+}
+
+model Objective {
+  id          String    @id
+  title       String
+  description String
+  status      String
+  difficulty  String
+  createdAt   DateTime @default(now())
+  completedAt DateTime?
+
+  workspaceId String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+
+  managerId String?
+  manager   User?  @relation(fields: [managerId], references: [id], onDelete: SetNull)
+
+  teamId String?
+  team   Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull)
+
+  tasks    Task[]
+  comments Comment[]
+}
+
+model Comment {
+  id        String   @id
+  content   String
+  createdAt DateTime @default(now())
+
+  authorId String
+  author   User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+
+  taskId String?
+  task   Task?  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+
+  objectiveId String?
+  objective   Objective? @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
 }
