@@ -8,6 +8,7 @@ import { nanoid } from "nanoid"
 
 export default class TaskController {
 
+
     async create(req: Request, res: Response) {
         try {
             const reqSchema = z.object({

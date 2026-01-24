@@ -6,7 +6,7 @@ import { nanoid } from "nanoid"
 
 
 export default class UserController {
-
+    
     async users(req: Request, res: Response) {
         try {
             const users = await prisma.user.findMany()
@@ -35,7 +35,7 @@ export default class UserController {
                 })
             }
 
-            const {position, name, email, password } = request.data
+            const { position, name, email, password } = request.data
             
             await prisma.user.create({
                 data: {
