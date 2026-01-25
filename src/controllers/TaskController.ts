@@ -45,7 +45,7 @@ export default class TaskController {
                 1: TaskStatus.InProgress,
                 2: TaskStatus.Finished
             }
-            const taskStateConverted = stateMap[status as keyof typeof stateMap] ?? TaskStatus.Pending
+            const stateConverted = stateMap[status as keyof typeof stateMap] ?? TaskStatus.Pending
             
             await prisma.task.create({
                 data: {
@@ -53,7 +53,7 @@ export default class TaskController {
                     title: title.toLowerCase(),
                     description: description.toLowerCase(),
                     difficulty: difficultyConverted,
-                    status: taskStateConverted,
+                    status: stateConverted,
                     managerId: manager,
                     teamId: team
                 }
