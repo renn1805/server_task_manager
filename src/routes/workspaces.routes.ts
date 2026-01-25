@@ -20,5 +20,13 @@ workspaceRoutes.post("/complete", (req, res) => {
     workspaceController.complete(req, res)
 })
 
+workspaceRoutes.post("/include", (req, res) => {
+    workspaceController.include(req, res)
+})
+
+workspaceRoutes.post("/remove", (req, res) => {
+    workspaceController.remove(req, res)
+})
+
 
 export default workspaceRoutes
