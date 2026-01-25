@@ -42,7 +42,7 @@ model Workspace {
   manager   User?   @relation(fields: [managerId], references: [id], onDelete: SetNull)
 
   members WorkspaceMember[]
-
+  teams Team[]
   tasks      Task[]
   objectives Objective[]
 }
@@ -64,6 +64,9 @@ model Team {
   id          String  @id
   name        String
   description String?
+
+  workspaceId String
+  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   managerId String?
   manager   User?          @relation(fields: [managerId], references: [id], onDelete: SetNull)

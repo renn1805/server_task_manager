@@ -3,6 +3,7 @@ import { Request, Response } from "express"
 import { prisma } from "../app"
 import { hashPassword, comparePassword } from "../utils/BcryptFunctions"
 import { nanoid } from "nanoid"
+import { sizeUserId } from "../Server"
 
 export default class UserController {
     
@@ -38,7 +39,7 @@ export default class UserController {
             
             await prisma.user.create({
                 data: {
-                    id: nanoid(11),
+                    id: nanoid(sizeUserId),
                     name: name.toLowerCase(),
                     email: email.toLowerCase(),
                     password: await hashPassword(password),

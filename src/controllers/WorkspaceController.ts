@@ -16,7 +16,8 @@ export default class WorkspaceController {
                             memberId: true,
                             nameMember: true
                         }
-                    }
+                    },
+                    teams: true
                 }
             })
             return res.status(200).send(workspaces)
@@ -148,7 +149,7 @@ export default class WorkspaceController {
             const { memberId, workspaceId, managerId } = request.data
 
             const workspaceManager = await prisma.workspace.findUnique({
-                where:{
+                where: {
                     id: workspaceId
                 },
                 select: {
@@ -158,7 +159,7 @@ export default class WorkspaceController {
 
             const isManager = managerId === workspaceManager?.managerId
 
-            if (!isManager){
+            if (!isManager) {
                 return res.status(400).send("The user is not worspace manager")
             }
 
@@ -187,9 +188,9 @@ export default class WorkspaceController {
         }
     }
 
-    async remove (req: Request, res: Response){
+    async remove(req: Request, res: Response) {
         try {
-        
+
             const reqSchema = z.object({
                 workspaceMemberId: z.string(),
                 workspaceId: z.string(),
@@ -198,7 +199,7 @@ export default class WorkspaceController {
 
             const request = reqSchema.safeParse(req.body)
 
-            if (!request.success){
+            if (!request.success) {
                 return res.status(400).json({
                     error: "Invalid data!",
                     description: request.error
@@ -217,7 +218,7 @@ export default class WorkspaceController {
             })
             const isManager = managerId === managerWorspace?.managerId
 
-            if (!isManager){
+            if (!isManager) {
                 return res.status(400).send("The user is not workspace manager")
             }
 

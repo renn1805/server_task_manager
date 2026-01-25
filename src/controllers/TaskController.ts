@@ -4,6 +4,7 @@ import { prisma } from "../app"
 import * as z from "zod"
 import { Request, Response } from "express"
 import { nanoid } from "nanoid"
+import { sizeTaskId } from "../Server"
 
 
 export default class TaskController {
@@ -48,7 +49,7 @@ export default class TaskController {
             
             await prisma.task.create({
                 data: {
-                    id: nanoid(6),
+                    id: nanoid(sizeTaskId),
                     title: title.toLowerCase(),
                     description: description.toLowerCase(),
                     difficulty: difficultyConverted,

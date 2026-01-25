@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import * as z from "zod"
 import { prisma } from "../app"
 import { nanoid } from "nanoid";
+import { sizeTeamId, sizeTeamMemberId } from "../Server";
 
 export class TeamController {
 
@@ -25,7 +26,8 @@ export class TeamController {
             const reqSchema = z.object({
                 name: z.string(),
                 description: z.string(),
-                managerId: z.string()
+                managerId: z.string(),
+                workspaceId: z.string()
             })
 
             const request = reqSchema.safeParse(req.body)
@@ -37,14 +39,15 @@ export class TeamController {
                 })
             }
 
-            const { name, description, managerId } = request.data
+            const { name, description, managerId, workspaceId } = request.data
 
             await prisma.team.create({
                 data: {
-                    id: nanoid(7),
+                    id: nanoid(sizeTeamId),
                     name,
                     description,
-                    managerId
+                    managerId,
+                    workspaceId
                 }
             })
 
@@ -86,7 +89,7 @@ export class TeamController {
 
             await prisma.teamsMembers.create({
                 data: {
-                    id: nanoid(7),
+                    id: nanoid(sizeTeamMemberId),
                     teamId,
                     memberId,
                     nameMember: userName?.name!
@@ -109,7 +112,7 @@ export class TeamController {
             })
 
             const request = reqSchema.safeParse(req.body)
-            if (!request.success){
+            if (!request.success) {
                 return res.status(400).json(
                     {
                         error: "Invalid Data",
@@ -118,14 +121,14 @@ export class TeamController {
                 )
             }
 
-            const {managerId, teamMemberId} = request.data
+            const { managerId, teamMemberId } = request.data
             const teamMemberManagerId = await prisma.teamsMembers.findUnique({
                 where: {
-                    id: teamMemberId 
+                    id: teamMemberId
                 },
                 select: {
                     team: {
-                        select:{
+                        select: {
                             managerId: true
                         }
                     }
@@ -134,19 +137,19 @@ export class TeamController {
 
             const isManager = managerId === teamMemberManagerId?.team.managerId
 
-            if (!isManager){
+            if (!isManager) {
                 return res.status(400).send("The user is not the team manager")
             }
 
             await prisma.teamsMembers.delete({
-                where:{
+                where: {
                     id: teamMemberId
                 }
             })
 
             return res.status(201).end()
 
-        }catch( error ){
+        } catch (error) {
             return res.status(500).send(error)
         }
     }
