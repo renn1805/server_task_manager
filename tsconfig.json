@@ -1,7 +1,6 @@
 {
    // Visit https://aka.ms/tsconfig to read more about this file
    "compilerOptions": {
-
       "module": "nodenext",
       "moduleResolution": "nodenext",
       "target": "esnext",
@@ -25,6 +24,7 @@
 
       //Adicionados para fazer com que o modo de importação do express fique com funções de importações padrão para bibliotecas antigas e novas
       "esModuleInterop": true,
-      "forceConsistentCasingInFileNames": true
+      "forceConsistentCasingInFileNames": true,
+      "allowSyntheticDefaultImports": true
    }
 }

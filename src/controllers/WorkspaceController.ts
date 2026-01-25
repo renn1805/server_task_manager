@@ -4,15 +4,12 @@ import { prisma } from "../app"
 import { nanoid } from "nanoid"
 import { error } from "node:console";
 
-
 export default class WorkspaceController {
 
     async workspaces(res: Response) {
         try {
-
             const workspaces = await prisma.workspace.findMany()
             return res.status(200).send(workspaces)
-
         } catch (error) {
             return res.status(500).send(error)
         }
@@ -79,6 +76,8 @@ export default class WorkspaceController {
                     managerId: managerId
                 }
             })
+
+            return res.status(201).end()
 
         } catch (error) {
             return res.status(500).send(error)

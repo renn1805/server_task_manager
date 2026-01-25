@@ -35,11 +35,11 @@ model Workspace {
   id           String    @id
   project_name String
   description  String
-  createdAt    DateTime @default(now())
-  completedAt  DateTime? 
+  createdAt    DateTime  @default(now())
+  completedAt  DateTime?
 
   managerId String?
-  manager   User?  @relation(fields: [managerId], references: [id], onDelete: SetNull)
+  manager   User?   @relation(fields: [managerId], references: [id], onDelete: SetNull)
 
   members WorkspaceMember[]
 
@@ -51,7 +51,7 @@ model WorkspaceMember {
   id String @id
 
   memberId String
-  member   User  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  member   User   @relation(fields: [memberId], references: [id], onDelete: Cascade)
 
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
@@ -75,11 +75,12 @@ model Team {
 model TeamsMembers {
   id String @id
 
-  memberId String
-  member   User  @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId   String
+  member     User   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  nameMember String @default("unknown")
 
   teamId String
-  team   Team  @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  team   Team   @relation(fields: [teamId], references: [id], onDelete: Cascade)
 
   @@unique([memberId, teamId])
 }
@@ -90,7 +91,7 @@ model Task {
   description String
   status      String
   difficulty  String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   completedAt DateTime?
 
   workspaceId String?
@@ -100,16 +101,16 @@ model Task {
   objectives  Objective? @relation(fields: [objectiveId], references: [id], onDelete: Cascade)
 
   teamId String?
-  team   Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
 
   parentId String?
-  parent   Task?  @relation("Subtasks", fields: [parentId], references: [id], onDelete: Cascade)
-  subtasks Task[] @relation("Subtasks")
+  parent   Task?   @relation("Subtasks", fields: [parentId], references: [id], onDelete: Cascade)
+  subtasks Task[]  @relation("Subtasks")
 
   comments Comment[]
 
   managerId String?
-  manager   User?  @relation(fields: [managerId], references: [id], onDelete: SetNull)
+  manager   User?   @relation(fields: [managerId], references: [id], onDelete: SetNull)
 }
 
 model Objective {
@@ -118,17 +119,17 @@ model Objective {
   description String
   status      String
   difficulty  String
-  createdAt   DateTime @default(now())
+  createdAt   DateTime  @default(now())
   completedAt DateTime?
 
   workspaceId String
   workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   managerId String?
-  manager   User?  @relation(fields: [managerId], references: [id], onDelete: SetNull)
+  manager   User?   @relation(fields: [managerId], references: [id], onDelete: SetNull)
 
   teamId String?
-  team   Team?  @relation(fields: [teamId], references: [id], onDelete: SetNull)
+  team   Team?   @relation(fields: [teamId], references: [id], onDelete: SetNull)
 
   tasks    Task[]
   comments Comment[]
@@ -140,10 +141,10 @@ model Comment {
   createdAt DateTime @default(now())
 
   authorId String
-  author   User  @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  author   User   @relation(fields: [authorId], references: [id], onDelete: Cascade)
 
   taskId String?
-  task   Task?  @relation(fields: [taskId], references: [id], onDelete: Cascade)
+  task   Task?   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   objectiveId String?
   objective   Objective? @relation(fields: [objectiveId], references: [id], onDelete: Cascade)

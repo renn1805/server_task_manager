@@ -1,5 +1,5 @@
 import { Router } from "express"
-import WorkspaceController from "../controllers/WokspaceController"
+import WorkspaceController from "../controllers/WorkspaceController"
 
 const workspaceRoutes = Router()
 const workspaceController = new WorkspaceController()

@@ -4,7 +4,6 @@ import { prisma } from "../app"
 import { hashPassword, comparePassword } from "../utils/BcryptFunctions"
 import { nanoid } from "nanoid"
 
-
 export default class UserController {
     
     async users(req: Request, res: Response) {
