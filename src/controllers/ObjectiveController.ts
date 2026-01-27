@@ -1,18 +1,18 @@
 import { Request, Response } from "express";
 import { error } from "node:console";
 import * as z from "zod"
-import { TaskDifficulty } from "../enum/TaskDifficulty";
-import { TaskStatus } from "../enum/TaskStatus";
+import { Difficulty, difficultyMap } from "../enum/TaskDifficulty";
+import { Status, stateMap } from "../enum/TaskStatus";
 import { prisma } from "../app"
 import { nanoid } from "nanoid";
 import { sizeObjectiveId } from "../Server";
 
 export default class ObjectiveController {
 
-    async objectives (req: Request, res: Response){
+    async objectives(req: Request, res: Response) {
         try {
             const objectives = await prisma.objective.findMany({
-                include:{
+                include: {
                     team: {
                         select: {
                             name: true
@@ -60,20 +60,8 @@ export default class ObjectiveController {
 
             const { title, description, status, difficulty, workspaceId, managerId, teamId } = request.data
 
-            const difficultyMap = {
-                0: TaskDifficulty.Undefined,
-                1: TaskDifficulty.Easy,
-                2: TaskDifficulty.Medium,
-                3: TaskDifficulty.Hard
-            }
-            const difficultyConverted = difficultyMap[difficulty as keyof typeof difficultyMap] ?? TaskDifficulty.Undefined
-
-            const stateMap = {
-                0: TaskStatus.Pending,
-                1: TaskStatus.InProgress,
-                2: TaskStatus.Finished
-            }
-            const stateConverted = stateMap[status as keyof typeof stateMap] ?? TaskStatus.Pending
+            const difficultyConverted = difficultyMap[difficulty as keyof typeof difficultyMap] ?? Difficulty.Undefined
+            const stateConverted = stateMap[status as keyof typeof stateMap] ?? Status.Pending
 
             await prisma.objective.create({
                 data: {
@@ -95,15 +83,15 @@ export default class ObjectiveController {
         }
     }
 
-    async complete (req: Request, res: Response){
+    async complete(req: Request, res: Response) {
         try {
-            
+
             const reqSchema = z.object({
                 objectiveId: z.string()
             })
 
             const request = reqSchema.safeParse(req.body)
-            if (!request.success){
+            if (!request.success) {
                 return res.status(400).json({
                     error: "Invalid data",
                     description: request.error

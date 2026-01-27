@@ -1,5 +1,5 @@
-import { TaskDifficulty } from "../enum/TaskDifficulty"
-import { TaskStatus } from "../enum/TaskStatus"
+import { Difficulty, difficultyMap } from "../enum/TaskDifficulty"
+import { Status, stateMap } from "../enum/TaskStatus"
 import { prisma } from "../app"
 import * as z from "zod"
 import { Request, Response } from "express"
@@ -8,8 +8,6 @@ import { sizeTaskId } from "../Server"
 
 
 export default class TaskController {
-
-
     async create(req: Request, res: Response) {
         try {
             const reqSchema = z.object({
@@ -32,20 +30,8 @@ export default class TaskController {
 
             const {team, manager, title, description, status, difficulty } = request.data
 
-            const difficultyMap = {
-                0: TaskDifficulty.Undefined,
-                1: TaskDifficulty.Easy,
-                2: TaskDifficulty.Medium,
-                3: TaskDifficulty.Hard
-            }
-            const difficultyConverted = difficultyMap[difficulty as keyof typeof difficultyMap] ?? TaskDifficulty.Undefined
-
-            const stateMap = {
-                0: TaskStatus.Pending,
-                1: TaskStatus.InProgress,
-                2: TaskStatus.Finished
-            }
-            const stateConverted = stateMap[status as keyof typeof stateMap] ?? TaskStatus.Pending
+            const difficultyConverted = difficultyMap[difficulty as keyof typeof difficultyMap] ?? Difficulty.Undefined
+            const stateConverted = stateMap[status as keyof typeof stateMap] ?? Status.Pending
             
             await prisma.task.create({
                 data: {
