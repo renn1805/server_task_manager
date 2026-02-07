@@ -2,8 +2,8 @@
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
 
 generator client {
-  provider = "prisma-client-js"
-  output   = "../generated/prisma"
+  provider      = "prisma-client-js"
+  output        = "../generated/prisma"
   binaryTargets = ["native", "debian-openssl-3.0.x"]
 }
 
@@ -42,8 +42,8 @@ model Workspace {
   managerId String?
   manager   User?   @relation(fields: [managerId], references: [id], onDelete: SetNull)
 
-  members WorkspaceMember[]
-  teams Team[]
+  members    WorkspaceMember[]
+  teams      Team[]
   tasks      Task[]
   objectives Objective[]
 }
@@ -51,8 +51,8 @@ model Workspace {
 model WorkspaceMember {
   id String @id
 
-  memberId String
-  member   User   @relation(fields: [memberId], references: [id], onDelete: Cascade)
+  memberId   String
+  member     User   @relation(fields: [memberId], references: [id], onDelete: Cascade)
   nameMember String @default("unknown")
 
   workspaceId String
@@ -67,7 +67,7 @@ model Team {
   description String?
 
   workspaceId String
-  workspace Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
+  workspace   Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
 
   managerId String?
   manager   User?          @relation(fields: [managerId], references: [id], onDelete: SetNull)
