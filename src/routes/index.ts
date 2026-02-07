@@ -6,6 +6,9 @@ import teamRouter from "./team.routes";
 import objectiveRouter from "./objective.reoutes";
 const routes = Router()
 
+routes.get("/ping", (req, res) => {
+    res.status(200).send("pong");
+});
 routes.use('/users', userRoutes)
 routes.use('/tasks', tasksRoutes)
 routes.use('/workspaces', workspaceRoutes)
