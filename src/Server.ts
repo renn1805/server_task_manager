@@ -2,8 +2,8 @@ import {app} from "./app"
 import routes from "./routes"
 
 
-const port = 3000
-app.listen(port, () => console.log("The server is running"))
+const PORT = (process.env.PORT || 3000) as number
+app.listen(PORT, '0.0.0.0', () => console.log("The server is running"))
 
 app.use(routes)
 

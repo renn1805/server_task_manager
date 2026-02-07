@@ -28,6 +28,12 @@ export default class ObjectiveController {
                         select: {
                             project_name: true,
                         }
+                    },
+                    tasks: {
+                        select: {
+                            title: true,
+                            description: true
+                        }
                     }
                 }
             })
