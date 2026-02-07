@@ -5,8 +5,10 @@ import { PrismaClient } from '../generated/prisma';
 import 'dotenv/config';
 
 // O segredo está aqui: passamos a URL dentro de um objeto, como o erro sugeriu
+const dbUrl = process.env.DATABASE_URL || 'file:/app/data/database.db';
+
 const adapter = new PrismaBetterSqlite3({
-    url: process.env.DATABASE_URL || 'file:./database.db'
+    url: dbUrl
 });
 
 const prisma = new PrismaClient({ adapter });
