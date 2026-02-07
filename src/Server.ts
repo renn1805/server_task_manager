@@ -5,7 +5,7 @@ import routes from "./routes"
 app.use(routes)
 
 const PORT = process.env.PORT || 3000
-app.listen(Number(PORT), () => console.log(`The server is running on port ${PORT}`))
+app.listen(PORT, () => console.log(`The server is running on port ${PORT}`))
 
 const smallerId = 7
 const mediumId = 8
