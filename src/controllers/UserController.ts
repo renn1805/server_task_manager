@@ -3,13 +3,20 @@ import { Request, Response } from "express"
 import { prisma } from "../app"
 import { hashPassword, comparePassword } from "../utils/BcryptFunctions"
 import { nanoid } from "nanoid"
-import { sizeUserId } from "../Server"
+import { SizeIds } from "../Server"
 
 export default class UserController {
-    
+
     async users(req: Request, res: Response) {
         try {
-            const users = await prisma.user.findMany()
+            const users = await prisma.user.findMany({
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                    position: true
+                }
+            })
             return res.status(200).send(users)
         } catch (error) {
             return res.status(500).send(error)
@@ -36,10 +43,10 @@ export default class UserController {
             }
 
             const { position, name, email, password } = request.data
-            
+
             await prisma.user.create({
                 data: {
-                    id: nanoid(sizeUserId),
+                    id: nanoid(SizeIds.sizeUserId),
                     name: name.toLowerCase(),
                     email: email.toLowerCase(),
                     password: await hashPassword(password),

@@ -7,18 +7,21 @@ app.use(routes)
 const PORT = process.env.PORT || 8080
 app.listen(PORT, () => console.log(`The server is running on port ${PORT}`))
 
-const smallerId = 7
-const mediumId = 8
-const largeId = 9
 
-export const sizeTeamId = largeId
-export const sizeTeamMemberId = mediumId
+export enum SizeIds {
+    sizeUserId = 11,
+    smallerId = 7,
+    mediumId = 8,
+    largeId = 9
+}
 
-export const sizeWorspaceId = largeId
-export const sizeWorspaceMemberId = mediumId
+export const sizeTeamId = SizeIds.largeId
+export const sizeTeamMemberId = SizeIds.mediumId
 
-export const sizeCommentId = smallerId
+export const sizeWorspaceId = SizeIds.largeId
+export const sizeWorspaceMemberId = SizeIds.mediumId
 
-export const sizeObjectiveId = largeId
-export const sizeTaskId = largeId
-export const sizeUserId = 11
+export const sizeCommentId = SizeIds.smallerId
+
+export const sizeObjectiveId = SizeIds.largeId
+export const sizeTaskId = SizeIds.largeId
