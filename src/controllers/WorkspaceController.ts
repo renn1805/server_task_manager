@@ -193,7 +193,6 @@ export default class WorkspaceController {
 
             const reqSchema = z.object({
                 workspaceMemberId: z.string(),
-                workspaceId: z.string(),
                 managerId: z.string()
             })
 
@@ -206,17 +205,19 @@ export default class WorkspaceController {
                 })
             }
 
-            const { workspaceMemberId, workspaceId, managerId } = request.data
+            const { workspaceMemberId, managerId } = request.data
 
-            const managerWorspace = await prisma.workspace.findUnique({
+            const workspaceMember = await prisma.workspaceMember.findUnique({
                 where: {
-                    id: workspaceId
+                    id: workspaceMemberId
                 },
-                select: {
-                    managerId: true
+                include: {
+                    workspace: {
+                        select: { managerId: true }
+                    }
                 }
             })
-            const isManager = managerId === managerWorspace?.managerId
+            const isManager = managerId === workspaceMember?.workspace.managerId
 
             if (!isManager) {
                 return res.status(400).send("The user is not workspace manager")
