@@ -4,7 +4,7 @@ import { TeamController } from "../controllers/TeamController"
 const teamController = new TeamController()
 const teamRouter = Router()
 
-teamRouter.get("/", (req, res) => {
+teamRouter.get("/:workspace", (req, res) => {
     teamController.teams(req, res)
 })
 
