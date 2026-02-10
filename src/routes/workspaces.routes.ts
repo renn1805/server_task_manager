@@ -5,7 +5,7 @@ const workspaceRoutes = Router()
 const workspaceController = new WorkspaceController()
 
 workspaceRoutes.get("/", (req, res) => {
-    workspaceController.workspaces(res)
+    workspaceController.workspaces(req, res)
 })
 
 workspaceRoutes.post("/", (req, res) => {

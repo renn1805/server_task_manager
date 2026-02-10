@@ -6,8 +6,36 @@ import { sizeWorspaceId, sizeWorspaceMemberId } from "../Server";
 
 export default class WorkspaceController {
 
-    async workspaces(res: Response) {
+    async workspaces(req: Request, res: Response) {
         try {
+
+            const { user } = req.query
+
+            if (user !== undefined) {
+
+                const workspaces = await prisma.workspace.findMany({
+                    where: {
+                        members: {
+                            some: {
+                                memberId: user.toString()
+                            }
+                        }
+                    },
+                    include: {
+                        members: {
+                            select: {
+                                id: true,
+                                memberId: true,
+                                nameMember: true
+                            }
+                        },
+                        teams: true
+                    }
+                })
+
+                return res.status(200).send(workspaces)
+            }
+
             const workspaces = await prisma.workspace.findMany({
                 include: {
                     members: {
@@ -20,6 +48,7 @@ export default class WorkspaceController {
                     teams: true
                 }
             })
+
             return res.status(200).send(workspaces)
         } catch (error) {
             return res.status(500).send(error)
