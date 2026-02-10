@@ -92,23 +92,13 @@ export default class ObjectiveController {
     async complete(req: Request, res: Response) {
         try {
 
-            const reqSchema = z.object({
-                objectiveId: z.string()
-            })
+            const {objective} = req.query
 
-            const request = reqSchema.safeParse(req.body)
-            if (!request.success) {
-                return res.status(400).json({
-                    error: "Invalid data",
-                    description: request.error
-                })
-            }
-
-            const { objectiveId } = request.data
+            if (objective === undefined) return res.status(400).send("Require ObjectiveId")
 
             await prisma.objective.update({
                 where: {
-                    id: objectiveId
+                    id: objective.toString()
                 },
                 data: {
                     completedAt: new Date()

@@ -4,15 +4,15 @@ import ObjectiveController from "../controllers/ObjectiveController";
 const objectiveRouter = Router()
 const objectiveController = new ObjectiveController()
 
-objectiveRouter.get("/", (req, res)=>{
+objectiveRouter.get("/", (req, res) => {
     objectiveController.objectives(req, res)
 })
 
-objectiveRouter.post("/", (req, res)=>{
+objectiveRouter.post("/", (req, res) => {
     objectiveController.create(req, res)
 })
 
-objectiveRouter.post("/complete", (req, res)=>{
+objectiveRouter.put("/complete", (req, res) => {
     objectiveController.complete(req, res)
 })
 
