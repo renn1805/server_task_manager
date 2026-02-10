@@ -8,6 +8,38 @@ import { sizeTaskId } from "../Server"
 
 
 export default class TaskController {
+
+    async tasks (req: Request, res: Response){
+        try {
+            
+            const {user} = req.query
+            console.log(user?.toString())
+            if (user !== undefined){
+
+                const tasks = await prisma.task.findMany({
+                    where: {
+                        OR: [{managerId: user.toString()}, {team:{
+                            members: {
+                                some:{
+                                    memberId: user.toString()
+                                }
+                            }
+                        }}]
+                    }
+                })
+
+                return res.status(200).send(tasks)
+            }
+
+            const tasks = await prisma.task.findMany()
+
+            return res.status(200).send(tasks)
+
+        } catch (error) {
+            return res.status(500).send(error)
+        }
+    }
+
     async create(req: Request, res: Response) {
         try {
             const reqSchema = z.object({
@@ -68,26 +100,16 @@ export default class TaskController {
 
     async delete(req: Request, res: Response) {
         try {
-            const reqSchema = z.object({
-                taskId: z.string(),
-                userId: z.string()
+
+            const taskId = req.params.task
+
+            if (taskId === undefined) return res.status(400).json({
+                message: "Require taksId"
             })
-
-            const request = reqSchema.safeParse(req.body)
-
-            if (!request.success) {
-                return res.status(400).json({
-                    error: "Invalid data!",
-                    description: request.error
-                })
-            }
-
-            const { taskId, userId } = request.data
 
             await prisma.task.delete({
                 where: {
-                    id: taskId,
-                    managerId: userId
+                    id: taskId
                 }
             })
 
