@@ -30,7 +30,6 @@ export default class UserController {
                     name: z.string(),
                     email: z.email(),
                     password: z.string().min(8),
-                    position: z.string()
                 }
             )
 
@@ -42,19 +41,24 @@ export default class UserController {
                 })
             }
 
-            const { position, name, email, password } = request.data
+            const { name, email, password } = request.data
 
-            await prisma.user.create({
+            const user = await prisma.user.create({
                 data: {
                     id: nanoid(SizeIds.sizeUserId),
                     name: name.toLowerCase(),
                     email: email.toLowerCase(),
                     password: await hashPassword(password),
-                    position: position.toLowerCase()
+                    position: ''
+                },
+                select:{
+                    id:true,
+                    name:true,
+                    email:true,
                 }
             })
 
-            return res.status(201).end()
+            return res.status(201).send(user)
         } catch (error) {
             return res.status(500).send(error)
         }
