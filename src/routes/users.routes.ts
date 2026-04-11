@@ -8,6 +8,10 @@ userRoutes.get("/",(req, res) => {
     userController.users(req, res)
 })
 
+userRoutes.post("/login",(req, res) => {
+    userController.login(req, res)
+})
+
 userRoutes.post("/",(req, res) => {
     userController.create(req, res)
 })

@@ -23,6 +23,51 @@ export default class UserController {
         }
     }
 
+    async login(req: Request, res: Response) {
+        try {
+
+            const reqSchema = z.object({
+                email: z.email(),
+                password: z.string()
+            })
+
+            const request = reqSchema.safeParse(req.body)
+            if (!request.success) {
+                return res.status(400).json({
+                    error: "Invalid Data!",
+                    description: request.error
+                })
+            }
+
+            const { email, password } = request.data
+
+            const emailUser = await prisma.user.findUnique({
+                where: {
+                    email
+                }
+            })
+            if (emailUser === null) return res.status(400).send('User not found!')
+
+            const validPassword = await comparePassword(password, emailUser.password)
+
+            if (validPassword) {
+                return res.status(200).json({
+                    user: {
+                        id: emailUser.id,
+                        name: emailUser.name,
+                        email: emailUser.email,
+                        position: emailUser.position,
+                    }
+                })
+            } else {
+                return res.status(400).send("Invalid Password!")
+            }
+
+        } catch (error) {
+            return res.status(500).send(error)
+        }
+    }
+
     async create(req: Request, res: Response) {
         try {
             const reqSchema = z.object(
@@ -51,10 +96,10 @@ export default class UserController {
                     password: await hashPassword(password),
                     position: ''
                 },
-                select:{
-                    id:true,
-                    name:true,
-                    email:true,
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
                 }
             })
 
