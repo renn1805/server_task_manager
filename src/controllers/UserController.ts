@@ -1,12 +1,11 @@
-import * as z from "zod"
-import { Request, Response } from "express"
-import { prisma } from "../app"
-import { hashPassword, comparePassword } from "../utils/BcryptFunctions"
-import { nanoid } from "nanoid"
-import { SizeIds } from "../Server"
+import * as z from "zod";
+import { Request, Response } from "express";
+import { prisma } from "../app";
+import { hashPassword, comparePassword } from "../utils/BcryptFunctions";
+import { nanoid } from "nanoid";
+import { SizeIds } from "../Server";
 
 export default class UserController {
-
     async users(req: Request, res: Response) {
         try {
             const users = await prisma.user.findMany({
@@ -14,41 +13,56 @@ export default class UserController {
                     id: true,
                     name: true,
                     email: true,
-                    position: true
-                }
-            })
-            return res.status(200).send(users)
+                    position: true,
+                },
+            });
+            return res.status(200).send(users);
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).json({
+                code: "FAIL_SEARCH_USERS",
+                message: "Falha na busca de usuarios",
+            });
         }
     }
 
     async login(req: Request, res: Response) {
         try {
-
             const reqSchema = z.object({
                 email: z.email(),
-                password: z.string()
-            })
+                password: z.string(),
+            });
 
-            const request = reqSchema.safeParse(req.body)
+            const request = reqSchema.safeParse(req.body);
             if (!request.success) {
+                const message = JSON.parse(request.error.message)
+                    .map((m: any) => m.message)
+                    .join("; ");
+
                 return res.status(400).json({
-                    error: "Invalid Data!",
-                    description: request.error
-                })
+                    code: "INVALID_DATA",
+                    message: message || "O fornato da requisição é invalido",
+                });
             }
 
-            const { email, password } = request.data
+            const { email, password } = request.data;
+
+            const normalizedEmail = email.toLowerCase();
 
             const emailUser = await prisma.user.findUnique({
                 where: {
-                    email
-                }
-            })
-            if (emailUser === null) return res.status(400).send('User not found!')
+                    email: normalizedEmail,
+                },
+            });
+            if (emailUser === null)
+                return res.status(400).json({
+                    code: "USER_NOT_FOUND",
+                    message: "Usuário não encontrado",
+                });
 
-            const validPassword = await comparePassword(password, emailUser.password)
+            const validPassword = await comparePassword(
+                password,
+                emailUser.password,
+            );
 
             if (validPassword) {
                 return res.status(200).json({
@@ -57,36 +71,40 @@ export default class UserController {
                         name: emailUser.name,
                         email: emailUser.email,
                         position: emailUser.position,
-                    }
-                })
+                    },
+                });
             } else {
-                return res.status(400).send("Invalid Password!")
+                return res.status(400).json({
+                    code: "INVALID_DATA",
+                    message: "Senha invalida",
+                });
             }
-
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).json({
+                code: "INTERNAL_ERROR",
+                message: "Erro no servidor",
+                details: error,
+            });
         }
     }
 
     async create(req: Request, res: Response) {
         try {
-            const reqSchema = z.object(
-                {
-                    name: z.string(),
-                    email: z.email(),
-                    password: z.string().min(8),
-                }
-            )
+            const reqSchema = z.object({
+                name: z.string(),
+                email: z.email(),
+                password: z.string().min(8),
+            });
 
-            const request = reqSchema.safeParse(req.body)
+            const request = reqSchema.safeParse(req.body);
             if (!request.success) {
                 return res.status(400).json({
                     error: "Invalid data",
-                    description: request.error
-                })
+                    description: request.error,
+                });
             }
 
-            const { name, email, password } = request.data
+            const { name, email, password } = request.data;
 
             const user = await prisma.user.create({
                 data: {
@@ -94,60 +112,56 @@ export default class UserController {
                     name: name.toLowerCase(),
                     email: email.toLowerCase(),
                     password: await hashPassword(password),
-                    position: ''
+                    position: "",
                 },
                 select: {
                     id: true,
                     name: true,
                     email: true,
-                }
-            })
+                },
+            });
 
-            return res.status(201).send(user)
+            return res.status(201).send(user);
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).send(error);
         }
-
     }
-
 
     async delete(req: Request, res: Response) {
         try {
             const reqSchema = z.object({
                 email: z.email(),
-                password: z.string()
-            })
-            const request = reqSchema.safeParse(req.body)
+                password: z.string(),
+            });
+            const request = reqSchema.safeParse(req.body);
             if (!request.success) {
                 return res.status(400).json({
                     error: "Invalid data",
-                    description: request.error
-                })
+                    description: request.error,
+                });
             }
 
-            const { email, password } = request.data
+            const { email, password } = request.data;
             const user = await prisma.user.findUnique({
                 where: {
-                    email: email.toLowerCase()
-                }
-            })
+                    email: email.toLowerCase(),
+                },
+            });
             if (!user) {
-                return res.status(400).send("User not found!")
+                return res.status(400).send("User not found!");
             }
-            if (!(comparePassword(password, user!.password))) {
-                return res.status(400).send("Password not match!")
+            if (!comparePassword(password, user!.password)) {
+                return res.status(400).send("Password not match!");
             }
             await prisma.user.delete({
                 where: {
-                    email: email
-                }
-            })
+                    email: email,
+                },
+            });
 
-            return res.status(204).end()
+            return res.status(204).end();
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).send(error);
         }
-
     }
-
 }
