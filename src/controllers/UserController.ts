@@ -1,9 +1,9 @@
 import * as z from "zod";
 import { Request, Response } from "express";
-import { prisma } from "../app";
+import { prisma } from "../App";
 import { hashPassword, comparePassword } from "../utils/BcryptFunctions";
 import { nanoid } from "nanoid";
-import { SizeIds } from "../Server";
+import { SizeIds } from "../utils/SizeIds";
 
 export default class UserController {
     async users(req: Request, res: Response) {
@@ -172,7 +172,7 @@ export default class UserController {
             if (!user) {
                 return res.status(400).send("User not found!");
             }
-            if (! await comparePassword(password, user!.password)) {
+            if (!(await comparePassword(password, user!.password))) {
                 return res.status(400).send("Password not match!");
             }
             await prisma.user.delete({

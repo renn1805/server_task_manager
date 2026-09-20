@@ -1,45 +1,45 @@
 import { Request, Response } from "express";
-import * as z from "zod"
-import { prisma } from "../app"
+import * as z from "zod";
+import { prisma } from "../App";
 import { nanoid } from "nanoid";
-import { sizeTeamId, sizeTeamMemberId } from "../Server";
+import { sizeTeamId, sizeTeamMemberId } from "../utils/SizeIds";
 
 export class TeamController {
-
     async teams(req: Request, res: Response) {
         try {
             const teams = await prisma.team.findMany({
                 include: {
-                    members: { select: { id: true, memberId: true, nameMember: true } },
-                }
-            })
+                    members: {
+                        select: { id: true, memberId: true, nameMember: true },
+                    },
+                },
+            });
 
-            return res.status(200).send(teams)
+            return res.status(200).send(teams);
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).send(error);
         }
     }
 
     async create(req: Request, res: Response) {
         try {
-
             const reqSchema = z.object({
                 name: z.string(),
                 description: z.string(),
                 managerId: z.string(),
-                workspaceId: z.string()
-            })
+                workspaceId: z.string(),
+            });
 
-            const request = reqSchema.safeParse(req.body)
+            const request = reqSchema.safeParse(req.body);
 
             if (!request.success) {
                 return res.status(400).json({
                     error: "Invalid data!",
-                    description: request.error
-                })
+                    description: request.error,
+                });
             }
 
-            const { name, description, managerId, workspaceId } = request.data
+            const { name, description, managerId, workspaceId } = request.data;
 
             await prisma.team.create({
                 data: {
@@ -47,110 +47,101 @@ export class TeamController {
                     name,
                     description,
                     managerId,
-                    workspaceId
-                }
-            })
+                    workspaceId,
+                },
+            });
 
-            return res.status(201).end()
-
+            return res.status(201).end();
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).send(error);
         }
-
-
     }
 
     async include(req: Request, res: Response) {
         try {
-
             const reqSchema = z.object({
                 teamId: z.string(),
-                memberId: z.string()
-            })
+                memberId: z.string(),
+            });
 
-            const request = reqSchema.safeParse(req.body)
+            const request = reqSchema.safeParse(req.body);
             if (!request.success) {
                 return res.status(400).json({
                     error: "Invalid data",
-                    description: request.error
-                })
+                    description: request.error,
+                });
             }
 
-            const { teamId, memberId } = request.data
+            const { teamId, memberId } = request.data;
 
             const userName = await prisma.user.findUnique({
                 where: {
-                    id: memberId
+                    id: memberId,
                 },
                 select: {
-                    name: true
-                }
-            })
+                    name: true,
+                },
+            });
 
             await prisma.teamsMembers.create({
                 data: {
                     id: nanoid(sizeTeamMemberId),
                     teamId,
                     memberId,
-                    nameMember: userName?.name!
-                }
-            })
+                    nameMember: userName?.name!,
+                },
+            });
 
-            return res.status(201).end()
-
+            return res.status(201).end();
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).send(error);
         }
     }
 
     async remove(req: Request, res: Response) {
         try {
-
             const reqSchema = z.object({
                 managerId: z.string(),
-                teamMemberId: z.string()
-            })
+                teamMemberId: z.string(),
+            });
 
-            const request = reqSchema.safeParse(req.body)
+            const request = reqSchema.safeParse(req.body);
             if (!request.success) {
-                return res.status(400).json(
-                    {
-                        error: "Invalid Data",
-                        description: request.error
-                    }
-                )
+                return res.status(400).json({
+                    error: "Invalid Data",
+                    description: request.error,
+                });
             }
 
-            const { managerId, teamMemberId } = request.data
+            const { managerId, teamMemberId } = request.data;
             const teamMemberManagerId = await prisma.teamsMembers.findUnique({
                 where: {
-                    id: teamMemberId
+                    id: teamMemberId,
                 },
                 select: {
                     team: {
                         select: {
-                            managerId: true
-                        }
-                    }
-                }
-            })
+                            managerId: true,
+                        },
+                    },
+                },
+            });
 
-            const isManager = managerId === teamMemberManagerId?.team.managerId
+            const isManager = managerId === teamMemberManagerId?.team.managerId;
 
             if (!isManager) {
-                return res.status(400).send("The user is not the team manager")
+                return res.status(400).send("The user is not the team manager");
             }
 
             await prisma.teamsMembers.delete({
                 where: {
-                    id: teamMemberId
-                }
-            })
+                    id: teamMemberId,
+                },
+            });
 
-            return res.status(201).end()
-
+            return res.status(201).end();
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).send(error);
         }
     }
 }

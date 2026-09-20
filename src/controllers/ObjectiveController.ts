@@ -1,73 +1,87 @@
 import { Request, Response } from "express";
 import { error } from "node:console";
-import * as z from "zod"
+import * as z from "zod";
 import { Difficulty, difficultyMap } from "../enum/TaskDifficulty";
 import { Status, stateMap } from "../enum/TaskStatus";
-import { prisma } from "../app"
+import { prisma } from "../App";
 import { nanoid } from "nanoid";
-import { sizeObjectiveId } from "../Server";
+import { sizeObjectiveId } from "../utils/SizeIds";
 
 export default class ObjectiveController {
-
     async objectives(req: Request, res: Response) {
         try {
             const objectives = await prisma.objective.findMany({
                 include: {
                     team: {
                         select: {
-                            name: true
-                        }
+                            name: true,
+                        },
                     },
                     manager: {
                         select: {
                             name: true,
-                            position: true
-                        }
+                            position: true,
+                        },
                     },
                     workspace: {
                         select: {
                             project_name: true,
-                        }
+                        },
                     },
                     tasks: {
                         select: {
                             title: true,
-                            description: true
-                        }
-                    }
-                }
-            })
-            return res.status(200).send(objectives)
+                            description: true,
+                        },
+                    },
+                },
+            });
+            return res.status(200).send(objectives);
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).send(error);
         }
     }
 
     async create(req: Request, res: Response) {
         try {
-
             const reqSchema = z.object({
                 title: z.string(),
                 description: z.string(),
                 status: z.union([z.literal(0), z.literal(1), z.literal(2)]),
-                difficulty: z.union([z.literal(0), z.literal(1), z.literal(2), z.literal(3)]),
+                difficulty: z.union([
+                    z.literal(0),
+                    z.literal(1),
+                    z.literal(2),
+                    z.literal(3),
+                ]),
                 workspaceId: z.string(),
                 managerId: z.string(),
                 teamId: z.string(),
-            })
+            });
 
-            const request = reqSchema.safeParse(req.body)
+            const request = reqSchema.safeParse(req.body);
             if (!request.success) {
                 return res.status(400).json({
                     error: "invalid data",
-                    description: error
-                })
+                    description: error,
+                });
             }
 
-            const { title, description, status, difficulty, workspaceId, managerId, teamId } = request.data
+            const {
+                title,
+                description,
+                status,
+                difficulty,
+                workspaceId,
+                managerId,
+                teamId,
+            } = request.data;
 
-            const difficultyConverted = difficultyMap[difficulty as keyof typeof difficultyMap] ?? Difficulty.Undefined
-            const stateConverted = stateMap[status as keyof typeof stateMap] ?? Status.Pending
+            const difficultyConverted =
+                difficultyMap[difficulty as keyof typeof difficultyMap] ??
+                Difficulty.Undefined;
+            const stateConverted =
+                stateMap[status as keyof typeof stateMap] ?? Status.Pending;
 
             await prisma.objective.create({
                 data: {
@@ -78,38 +92,35 @@ export default class ObjectiveController {
                     difficulty: difficultyConverted,
                     workspaceId,
                     managerId,
-                    teamId
-                }
-            })
+                    teamId,
+                },
+            });
 
-            return res.status(201).end()
-
+            return res.status(201).end();
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).send(error);
         }
     }
 
     async complete(req: Request, res: Response) {
         try {
+            const { objective } = req.query;
 
-            const {objective} = req.query
-
-            if (objective === undefined) return res.status(400).send("Require ObjectiveId")
+            if (objective === undefined)
+                return res.status(400).send("Require ObjectiveId");
 
             await prisma.objective.update({
                 where: {
-                    id: objective.toString()
+                    id: objective.toString(),
                 },
                 data: {
-                    completedAt: new Date()
-                }
-            })
+                    completedAt: new Date(),
+                },
+            });
 
-            return res.status(201).end()
-
+            return res.status(201).end();
         } catch (error) {
-            return res.status(500).send(error)
+            return res.status(500).send(error);
         }
     }
-
 }
