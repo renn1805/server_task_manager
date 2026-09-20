@@ -4,7 +4,7 @@ import { prisma } from "../Server";
 import { hashPassword, comparePassword } from "../utils/BcryptFunctions";
 import { nanoid } from "nanoid";
 import { SizeIds } from "../utils/SizeIds";
-import FailSearchUsersError from "../errors/FailSearchUsersError";
+import FailSearchError from "../errors/FailSearchError";
 import InvalidDataError from "../errors/InvalidDataError";
 import UserNotFoundError from "../errors/UserNotFoundError";
 import AppError from "../errors/AppError";
@@ -24,7 +24,7 @@ export default class UserController {
 
             return res.status(200).send(users);
         } catch (error) {
-            throw new FailSearchUsersError();
+            throw new FailSearchError();
         }
     }
 

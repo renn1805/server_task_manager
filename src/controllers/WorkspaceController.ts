@@ -4,11 +4,20 @@ import { prisma } from "../Server";
 import { nanoid } from "nanoid";
 import { sizeWorspaceId, sizeWorspaceMemberId } from "../utils/SizeIds";
 
+import AppError from "../errors/AppError";
+import InvalidDataError from "../errors/InvalidDataError";
+import InternalError from "../errors/InternalError";
+import UserNotFoundError from "../errors/UserNotFoundError";
+import WorkspaceNotFoundError from "../errors/WorkspaceNotFoundError";
+import NotWorkspaceManagerError from "../errors/NotWorkspaceManagerError";
+import FailSearchError from "../errors/FailSearchError";
+
 export default class WorkspaceController {
     async workspaces(req: Request, res: Response) {
         try {
             const { user } = req.query;
 
+            //? Se a req tiver usuario pega apenas os workspaces dele
             if (user !== undefined) {
                 const workspaces = await prisma.workspace.findMany({
                     where: {
@@ -30,7 +39,7 @@ export default class WorkspaceController {
                     },
                 });
 
-                return res.status(200).send(workspaces);
+                return res.status(200).json({ workspaces });
             }
 
             const workspaces = await prisma.workspace.findMany({
@@ -46,9 +55,9 @@ export default class WorkspaceController {
                 },
             });
 
-            return res.status(200).send(workspaces);
+            return res.status(200).json({ workspaces });
         } catch (error) {
-            return res.status(500).send(error);
+            throw new FailSearchError();
         }
     }
 
@@ -63,26 +72,36 @@ export default class WorkspaceController {
             const request = reqSchema.safeParse(req.body);
 
             if (!request.success) {
-                return res.status(400).json({
-                    error: "Invalid data!",
-                    description: request.error,
-                });
+                const message = JSON.parse(request.error.message)
+                    .map(
+                        (m: any) =>
+                            `${(m.path as string[]).findLast((e) => true)} -> ${m.message}`,
+                    )
+                    .join("; ");
+
+                throw new InvalidDataError(
+                    message || "O formato da requisição é inválido",
+                );
             }
 
             const { projectName, description, managerId } = request.data;
 
-            await prisma.workspace.create({
+            const workspace = await prisma.workspace.create({
                 data: {
                     id: nanoid(sizeWorspaceId),
                     project_name: projectName.toLowerCase(),
                     description: description.toLowerCase(),
-                    managerId: managerId,
+                    managerId,
                 },
             });
 
-            return res.status(201).end();
+            return res.status(201).json({ workspace });
         } catch (error) {
-            return res.status(500).send(error);
+            if (error instanceof AppError) {
+                throw error;
+            }
+
+            throw new InternalError();
         }
     }
 
@@ -94,11 +113,18 @@ export default class WorkspaceController {
             });
 
             const request = reqSchema.safeParse(req.body);
+
             if (!request.success) {
-                return res.status(400).json({
-                    error: "Invalid data!",
-                    description: request.error,
-                });
+                const message = JSON.parse(request.error.message)
+                    .map(
+                        (m: any) =>
+                            `${(m.path as string[]).findLast((e) => true)} -> ${m.message}`,
+                    )
+                    .join("; ");
+
+                throw new InvalidDataError(
+                    message || "O formato da requisição é inválido",
+                );
             }
 
             const { workspaceId, managerId } = request.data;
@@ -106,13 +132,17 @@ export default class WorkspaceController {
             await prisma.workspace.delete({
                 where: {
                     id: workspaceId,
-                    managerId: managerId,
+                    managerId,
                 },
             });
 
-            return res.status(201).end();
+            return res.status(204).end();
         } catch (error) {
-            return res.status(500).send(error);
+            if (error instanceof AppError) {
+                throw error;
+            }
+
+            throw new InternalError();
         }
     }
 
@@ -123,17 +153,28 @@ export default class WorkspaceController {
             });
 
             const request = reqSchema.safeParse(req.body);
+
             if (!request.success) {
-                return res.status(400).json({
-                    error: "workspace undefined",
-                    description: request.error,
-                });
+                const message = JSON.parse(request.error.message)
+                    .map(
+                        (m: any) =>
+                            `${(m.path as string[]).findLast((e) => true)} -> ${m.message}`,
+                    )
+                    .join("; ");
+
+                throw new InvalidDataError(
+                    message || "O formato da requisição é inválido",
+                );
             }
 
             const { workspaceId } = request.data;
 
-            if (!workspaceId) {
-                return res.status(400).send("workspace undefined");
+            const workspace = await prisma.workspace.findUnique({
+                where: { id: workspaceId },
+            });
+
+            if (!workspace) {
+                throw new WorkspaceNotFoundError();
             }
 
             await prisma.workspace.update({
@@ -142,14 +183,20 @@ export default class WorkspaceController {
                     completedAt: new Date(),
                 },
             });
-            return res.status(201).end();
+
+            return res.status(204).end();
         } catch (error) {
-            return res.status(500).send(error);
+            if (error instanceof AppError) {
+                throw error;
+            }
+
+            throw new InternalError();
         }
     }
 
     async include(req: Request, res: Response) {
         try {
+            //? apenas gerente adiciona
             const reqSchema = z.object({
                 memberId: z.string(),
                 workspaceId: z.string(),
@@ -157,11 +204,18 @@ export default class WorkspaceController {
             });
 
             const request = reqSchema.safeParse(req.body);
+
             if (!request.success) {
-                return res.status(400).json({
-                    error: "Invalid data",
-                    description: request.error,
-                });
+                const message = JSON.parse(request.error.message)
+                    .map(
+                        (m: any) =>
+                            `${(m.path as string[]).findLast((e) => true)} -> ${m.message}`,
+                    )
+                    .join("; ");
+
+                throw new InvalidDataError(
+                    message || "O formato da requisição é inválido",
+                );
             }
 
             const { memberId, workspaceId, managerId } = request.data;
@@ -175,10 +229,14 @@ export default class WorkspaceController {
                 },
             });
 
+            if (!workspaceManager) {
+                throw new WorkspaceNotFoundError();
+            }
+
             const isManager = managerId === workspaceManager?.managerId;
 
             if (!isManager) {
-                return res.status(400).send("The user is not worspace manager");
+                throw new NotWorkspaceManagerError();
             }
 
             const nameMember = await prisma.user.findUnique({
@@ -190,23 +248,32 @@ export default class WorkspaceController {
                 },
             });
 
+            if (!nameMember) {
+                throw new UserNotFoundError();
+            }
+
             await prisma.workspaceMember.create({
                 data: {
                     id: nanoid(sizeWorspaceMemberId),
                     memberId,
                     workspaceId,
-                    nameMember: nameMember?.name!,
+                    nameMember: nameMember.name,
                 },
             });
 
-            return res.status(201).end();
+            return res.status(204).end();
         } catch (error) {
-            return res.status(500).send(error);
+            if (error instanceof AppError) {
+                throw error;
+            }
+
+            throw new InternalError();
         }
     }
 
     async remove(req: Request, res: Response) {
         try {
+            //? exclui o usuario direto da lista de membros do workspace e só o gerente pode fazer isso
             const reqSchema = z.object({
                 workspaceMemberId: z.string(),
                 managerId: z.string(),
@@ -215,10 +282,16 @@ export default class WorkspaceController {
             const request = reqSchema.safeParse(req.body);
 
             if (!request.success) {
-                return res.status(400).json({
-                    error: "Invalid data!",
-                    description: request.error,
-                });
+                const message = JSON.parse(request.error.message)
+                    .map(
+                        (m: any) =>
+                            `${(m.path as string[]).findLast((e) => true)} -> ${m.message}`,
+                    )
+                    .join("; ");
+
+                throw new InvalidDataError(
+                    message || "O formato da requisição é inválido",
+                );
             }
 
             const { workspaceMemberId, managerId } = request.data;
@@ -229,17 +302,19 @@ export default class WorkspaceController {
                 },
                 include: {
                     workspace: {
-                        select: { managerId: true },
+                        select: {
+                            managerId: true,
+                        },
                     },
                 },
             });
-            const isManager =
-                managerId === workspaceMember?.workspace.managerId;
 
-            if (!isManager) {
-                return res
-                    .status(400)
-                    .send("The user is not workspace manager");
+            if (!workspaceMember) {
+                throw new WorkspaceNotFoundError();
+            }
+
+            if (managerId !== workspaceMember.workspace.managerId) {
+                throw new NotWorkspaceManagerError();
             }
 
             await prisma.workspaceMember.delete({
@@ -248,9 +323,13 @@ export default class WorkspaceController {
                 },
             });
 
-            return res.status(201).end();
+            return res.status(204).end();
         } catch (error) {
-            return res.status(500).send(error);
+            if (error instanceof AppError) {
+                throw error;
+            }
+
+            throw new InternalError();
         }
     }
 }
