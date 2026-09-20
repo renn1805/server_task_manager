@@ -3,7 +3,7 @@ import { error } from "node:console";
 import * as z from "zod";
 import { Difficulty, difficultyMap } from "../enum/TaskDifficulty";
 import { Status, stateMap } from "../enum/TaskStatus";
-import { prisma } from "../App";
+import { prisma } from "../Server";
 import { nanoid } from "nanoid";
 import { sizeObjectiveId } from "../utils/SizeIds";
 

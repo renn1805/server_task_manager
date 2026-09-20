@@ -1,6 +1,6 @@
 import { Difficulty, difficultyMap } from "../enum/TaskDifficulty";
 import { Status, stateMap } from "../enum/TaskStatus";
-import { prisma } from "../App";
+import { prisma } from "../Server";
 import * as z from "zod";
 import { Request, Response } from "express";
 import { nanoid } from "nanoid";

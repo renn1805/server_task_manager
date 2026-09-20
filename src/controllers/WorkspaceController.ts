@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import * as z from "zod";
-import { prisma } from "../App";
+import { prisma } from "../Server";
 import { nanoid } from "nanoid";
 import { sizeWorspaceId, sizeWorspaceMemberId } from "../utils/SizeIds";
 
