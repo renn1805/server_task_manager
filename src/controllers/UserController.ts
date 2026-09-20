@@ -70,7 +70,6 @@ export default class UserController {
                         id: emailUser.id,
                         name: emailUser.name,
                         email: emailUser.email,
-                        position: emailUser.position,
                     },
                 });
             } else {
@@ -97,22 +96,42 @@ export default class UserController {
             });
 
             const request = reqSchema.safeParse(req.body);
+
             if (!request.success) {
+                const message = JSON.parse(request.error.message)
+                    .map(
+                        (m: any) =>
+                            `${(m.path as string[]).findLast((e) => true)} -> ${m.message}`,
+                    )
+                    .join("; ");
+
                 return res.status(400).json({
-                    error: "Invalid data",
-                    description: request.error,
+                    code: "INVALID_DATA",
+                    message: message || "O formato da requisição é inválido",
                 });
             }
 
             const { name, email, password } = request.data;
+            const normalizedEmail = email.toLowerCase();
+
+            const emailUser = await prisma.user.findUnique({
+                where: {
+                    email: normalizedEmail,
+                },
+            });
+
+            if (emailUser !== null)
+                return res.status(400).json({
+                    code: "USER_ALREADY_EXISTS",
+                    message: "Já existe um usuário com este email",
+                });
 
             const user = await prisma.user.create({
                 data: {
                     id: nanoid(SizeIds.sizeUserId),
                     name: name.toLowerCase(),
-                    email: email.toLowerCase(),
+                    email: normalizedEmail,
                     password: await hashPassword(password),
-                    position: "",
                 },
                 select: {
                     id: true,
@@ -121,12 +140,15 @@ export default class UserController {
                 },
             });
 
-            return res.status(201).send(user);
+            return res.status(201).json({ user });
         } catch (error) {
-            return res.status(500).send(error);
+            return res.status(500).json({
+                code: "INTERNAL_ERROR",
+                message: "Erro no servidor",
+                details: error,
+            });
         }
     }
-
     async delete(req: Request, res: Response) {
         try {
             const reqSchema = z.object({

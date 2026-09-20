@@ -16,7 +16,6 @@ model User {
   name     String
   email    String @unique
   password String
-  position String
 
   //para aceitar a ser chave estrangeira
   tasksManager Task[]
