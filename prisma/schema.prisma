@@ -39,7 +39,7 @@ model Workspace {
   completedAt  DateTime?
 
   managerId String?
-  manager   User?   @relation(fields: [managerId], references: [id], onDelete: SetNull)
+  manager   User?   @relation(fields: [managerId], references: [id], onDelete: Cascade)
 
   members    WorkspaceMember[]
   teams      Team[]

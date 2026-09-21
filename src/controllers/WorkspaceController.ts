@@ -13,36 +13,66 @@ import NotWorkspaceManagerError from "../errors/NotWorkspaceManagerError";
 import FailSearchError from "../errors/FailSearchError";
 
 export default class WorkspaceController {
+    async workspaceById(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+
+            if (!id || id.trim().length === 0) {
+                throw new InvalidDataError("ID do workspace não enviado");
+            }
+
+            const workspace = await prisma.workspace.findUnique({
+                where: {
+                    id,
+                },
+                include: {
+                    members: {
+                        select: {
+                            id: true,
+                            member: {
+                                select: {
+                                    id: true,
+                                    name: true,
+                                    email: true,
+                                },
+                            },
+                        },
+                    },
+                    teams: true,
+                    tasks: true,
+                    objectives: true,
+                },
+            });
+
+            if (!workspace) {
+                throw new WorkspaceNotFoundError();
+            }
+
+            return res.status(200).json({ workspace });
+        } catch (error) {
+            if (error instanceof AppError) {
+                throw error;
+            }
+
+            throw new FailSearchError();
+        }
+    }
+
     async workspaces(req: Request, res: Response) {
         try {
             const { user } = req.query;
-
-            //? Se a req tiver usuario pega apenas os workspaces dele
-            if (user !== undefined) {
-                const workspaces = await prisma.workspace.findMany({
-                    where: {
-                        members: {
-                            some: {
-                                memberId: user.toString(),
-                            },
-                        },
-                    },
-                    include: {
-                        members: {
-                            select: {
-                                id: true,
-                                memberId: true,
-                                nameMember: true,
-                            },
-                        },
-                        teams: true,
-                    },
-                });
-
-                return res.status(200).json({ workspaces });
+            if (!user || user.toString().trim().length === 0) {
+                throw new InvalidDataError("Usuário não enviado");
             }
 
             const workspaces = await prisma.workspace.findMany({
+                where: {
+                    members: {
+                        some: {
+                            memberId: user.toString(),
+                        },
+                    },
+                },
                 include: {
                     members: {
                         select: {
@@ -57,6 +87,10 @@ export default class WorkspaceController {
 
             return res.status(200).json({ workspaces });
         } catch (error) {
+            if (error instanceof AppError) {
+                throw error;
+            }
+
             throw new FailSearchError();
         }
     }
@@ -86,12 +120,31 @@ export default class WorkspaceController {
 
             const { projectName, description, managerId } = request.data;
 
+            const manager = await prisma.user.findUnique({
+                where: {
+                    id: managerId,
+                },
+            });
+
+            if (!manager) {
+                throw new UserNotFoundError();
+            }
+
             const workspace = await prisma.workspace.create({
                 data: {
                     id: nanoid(sizeWorspaceId),
                     project_name: projectName.toLowerCase(),
                     description: description.toLowerCase(),
-                    managerId,
+                    managerId: manager.id,
+                },
+            });
+
+            await prisma.workspaceMember.create({
+                data: {
+                    id: nanoid(sizeWorspaceMemberId),
+                    memberId: manager.id,
+                    workspaceId: workspace.id,
+                    nameMember: manager.name,
                 },
             });
 

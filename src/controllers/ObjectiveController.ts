@@ -9,34 +9,38 @@ import { sizeObjectiveId } from "../utils/SizeIds";
 
 export default class ObjectiveController {
     async objectives(req: Request, res: Response) {
+        
         try {
             const objectives = await prisma.objective.findMany({
                 include: {
                     team: {
                         select: {
+                            id: true,
                             name: true,
                         },
                     },
                     manager: {
                         select: {
-                            name: true,
-                            position: true,
+                            id: true,
+                            name: true
                         },
                     },
                     workspace: {
                         select: {
+                            id: true,
                             project_name: true,
                         },
                     },
                     tasks: {
                         select: {
+                            id: true,
                             title: true,
                             description: true,
                         },
                     },
                 },
             });
-            return res.status(200).send(objectives);
+            return res.status(200).json({objectives});
         } catch (error) {
             return res.status(500).send(error);
         }
