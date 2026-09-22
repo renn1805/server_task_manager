@@ -4,7 +4,7 @@ import { prisma } from "../Server";
 import * as z from "zod";
 import { Request, Response } from "express";
 import { nanoid } from "nanoid";
-import { sizeTaskId } from "../utils/SizeIds";
+import { sizeTaskId } from "../util/SizeIds";
 
 export default class TaskController {
     async tasks(req: Request, res: Response) {

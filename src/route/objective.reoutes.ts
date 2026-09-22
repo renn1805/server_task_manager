@@ -1,5 +1,5 @@
 import { Router } from "express";
-import ObjectiveController from "../controllers/ObjectiveController";
+import ObjectiveController from "../controller/ObjectiveController";
 
 const objectiveRouter = Router()
 const objectiveController = new ObjectiveController()

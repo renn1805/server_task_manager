@@ -4,8 +4,8 @@ import { PrismaBetterSqlite3 } from "@prisma/adapter-better-sqlite3";
 import { PrismaLibSql } from "@prisma/adapter-libsql";
 import { PrismaClient } from "../generated/prisma";
 import "dotenv/config";
-import routes from "./routes";
-import errorHandler from "./middlewares/ErrorHandler";
+import routes from "./route";
+import errorHandler from "./middleware/ErrorHandler";
 
 // O segredo está aqui: passamos a URL dentro de um objeto, como o erro sugeriu
 const dbUrl = process.env.DATABASE_URL || "file:/app/data/database.db";

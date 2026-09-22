@@ -1,15 +1,15 @@
 import * as z from "zod";
 import { Request, Response } from "express";
 import { prisma } from "../Server";
-import { hashPassword, comparePassword } from "../utils/BcryptFunctions";
+import { hashPassword, comparePassword } from "../util/BcryptFunctions";
 import { nanoid } from "nanoid";
-import { SizeIds } from "../utils/SizeIds";
-import FailSearchError from "../errors/FailSearchError";
-import InvalidDataError from "../errors/InvalidDataError";
-import UserNotFoundError from "../errors/UserNotFoundError";
-import AppError from "../errors/AppError";
-import InternalError from "../errors/InternalError";
-import UserAlreadyExistsError from "../errors/UserAlreadyExistsError";
+import { SizeIds } from "../util/SizeIds";
+import FailSearchError from "../error/FailSearchError";
+import InvalidDataError from "../error/InvalidDataError";
+import UserNotFoundError from "../error/UserNotFoundError";
+import AppError from "../error/AppError";
+import InternalError from "../error/InternalError";
+import UserAlreadyExistsError from "../error/UserAlreadyExistsError";
 
 export default class UserController {
 

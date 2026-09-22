@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import * as z from "zod";
 import { prisma } from "../Server";
 import { nanoid } from "nanoid";
-import { sizeTeamId, sizeTeamMemberId } from "../utils/SizeIds";
+import { sizeTeamId, sizeTeamMemberId } from "../util/SizeIds";
 
 export class TeamController {
     async teams(req: Request, res: Response) {

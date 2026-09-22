@@ -5,12 +5,12 @@ import { Difficulty, difficultyMap } from "../enum/TaskDifficulty";
 import { Status, stateMap } from "../enum/TaskStatus";
 import { prisma } from "../Server";
 import { nanoid } from "nanoid";
-import { sizeObjectiveId } from "../utils/SizeIds";
-import FailSearchError from "../errors/FailSearchError";
+import { sizeObjectiveId } from "../util/SizeIds";
+import FailSearchError from "../error/FailSearchError";
 
 export default class ObjectiveController {
     async objectives(req: Request, res: Response) {
-        
+
         try {
             const objectives = await prisma.objective.findMany({
                 include: {
@@ -41,7 +41,7 @@ export default class ObjectiveController {
                     },
                 },
             });
-            return res.status(200).json({objectives});
+            return res.status(200).json({ objectives });
         } catch (error) {
             throw new FailSearchError();
         }
