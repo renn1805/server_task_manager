@@ -12,6 +12,40 @@ import InternalError from "../errors/InternalError";
 import UserAlreadyExistsError from "../errors/UserAlreadyExistsError";
 
 export default class UserController {
+
+    async userById(req: Request, res: Response) {
+        try {
+            const { id } = req.params;
+
+            if (!id || id.length === 0) {
+                throw new InvalidDataError("ID do usuario não enviado");
+            }
+
+            const user = await prisma.user.findUnique({
+                where: {
+                    id,
+                },
+                select: {
+                    id: true,
+                    name: true,
+                    email: true,
+                },
+            });
+
+            if (!user) {
+                throw new UserNotFoundError();
+            }
+
+            return res.status(200).json({ user });
+        } catch (error) {
+            if (error instanceof AppError) {
+                throw error;
+            }
+
+            throw new FailSearchError();
+        }
+    }
+
     async users(req: Request, res: Response) {
         try {
             const users = await prisma.user.findMany({

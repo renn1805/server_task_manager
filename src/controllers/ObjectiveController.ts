@@ -6,6 +6,7 @@ import { Status, stateMap } from "../enum/TaskStatus";
 import { prisma } from "../Server";
 import { nanoid } from "nanoid";
 import { sizeObjectiveId } from "../utils/SizeIds";
+import FailSearchError from "../errors/FailSearchError";
 
 export default class ObjectiveController {
     async objectives(req: Request, res: Response) {
@@ -42,7 +43,7 @@ export default class ObjectiveController {
             });
             return res.status(200).json({objectives});
         } catch (error) {
-            return res.status(500).send(error);
+            throw new FailSearchError();
         }
     }
 

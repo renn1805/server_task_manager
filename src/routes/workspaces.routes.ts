@@ -8,13 +8,14 @@ workspaceRoutes.get("/", (req, res) => {
     return workspaceController.workspaces(req, res);
 });
 
+workspaceRoutes.get("/:id", (req, res) => {
+    return workspaceController.workspaceById(req, res);
+});
+
 workspaceRoutes.post("/", (req, res) => {
     return workspaceController.create(req, res);
 });
 
-workspaceRoutes.get("/:id", (req, res) => {
-    return workspaceController.workspaceById(req, res);
-});
 
 workspaceRoutes.post("/delete", (req, res) => {
     return workspaceController.delete(req, res);

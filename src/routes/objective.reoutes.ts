@@ -5,15 +5,15 @@ const objectiveRouter = Router()
 const objectiveController = new ObjectiveController()
 
 objectiveRouter.get("/", (req, res) => {
-    objectiveController.objectives(req, res)
+    return objectiveController.objectives(req, res)
 })
 
 objectiveRouter.post("/", (req, res) => {
-    objectiveController.create(req, res)
+    return objectiveController.create(req, res)
 })
 
 objectiveRouter.put("/complete", (req, res) => {
-    objectiveController.complete(req, res)
+    return objectiveController.complete(req, res)
 })
 
 

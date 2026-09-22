@@ -40,16 +40,7 @@ export default class WorkspaceController {
                     },
                     teams: true,
                     tasks: true,
-                    objectives: {
-                        select: {
-                            team: {
-                                select: {
-                                    id: true,
-                                    manager: true
-                                }
-                            }
-                        }
-                    },
+                    objectives: true,
                 },
             });
 
