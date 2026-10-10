@@ -10,7 +10,16 @@ Siga esta ordem. Cada etapa se apoia na anterior.
 |---|------|--------------|--------|
 | 1 | [Requisitos](requirements/) | O que o sistema deve fazer e por quê | Planejado |
 | 2 | [Especificações funcionais](requirements/functional-specifications/) | Detalhe de cada funcionalidade, uma por arquivo | Planejado |
-| 3 | [Domínio](domain/) | Entidades, regras de negócio e vocabulário do projeto | Planejado |
+| 3 | [Domínio](domain/) | Entidades, regras de negócio e vocabulário do projeto | Em andamento |
+| 3.1 | [Visão geral do domínio](domain/overview.md) | Termos, diagrama de relacionamentos e pendências gerais | Em andamento |
+| 3.2 | [User](domain/user.md) | Pessoa com conta no sistema | Em andamento |
+| 3.3 | [Workspace](domain/workspace.md) | Espaço onde um projeto é organizado | Em andamento |
+| 3.4 | [Workspace Member](domain/workspace-member.md) | Vínculo entre User e Workspace | Em andamento |
+| 3.5 | [Team](domain/team.md) | Grupo de pessoas dentro de um Workspace | Em andamento |
+| 3.6 | [Team Member](domain/team-member.md) | Vínculo entre User e Team | Em andamento |
+| 3.7 | [Objective](domain/objective.md) | Meta do Workspace que agrupa Tasks | Em andamento |
+| 3.8 | [Task](domain/task.md) | Unidade de trabalho, com subtasks | Em andamento |
+| 3.9 | [Comment](domain/comment.md) | Comentário em Task ou Objective | Em andamento |
 | 4 | [API](api/) | Inventário de endpoints, entradas e saídas | Planejado |
 | 5 | [Arquitetura](architecture/) | Visão geral de como o servidor é organizado | Planejado |
 | 6 | [Decisões de arquitetura (ADR)](architecture/adr/) | Registro das decisões técnicas e do motivo de cada uma | Planejado |
