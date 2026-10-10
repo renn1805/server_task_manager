@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Documentação</title>
+<script>
+  // Aplica o tema antes de desenhar a página (evita "piscar")
+  (function () {
+    var t = null;
+    try { t = localStorage.getItem('docs-theme'); } catch (e) {}
+    if (!t) t = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+    document.documentElement.dataset.theme = t;
+  })();
+</script>
+<!-- Cores do código (highlight.js): um tema claro e um escuro, o app.js alterna entre eles -->
+<link id="hl-light" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+<link id="hl-dark" rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css" disabled>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <button id="menuBtn" class="only-m" aria-label="Menu">☰</button>
+  <div class="brand" id="brand">📚 Documentação</div>
+  <button id="theme" aria-label="Alternar tema">🌓</button>
+</header>
+
+<section id="msg" hidden></section>
+
+<div id="app">
+  <aside id="side">
+    <input id="q" type="search" placeholder="Buscar nos documentos…" autocomplete="off">
+    <nav id="tree"></nav>
+    <div id="results" hidden></div>
+  </aside>
+  <main id="content"><p class="muted">Carregando…</p></main>
+  <aside id="toc"></aside>
+</div>
+
+<!-- Bibliotecas (versões fixas): markdown, cores do código e diagramas -->
+<script src="https://cdn.jsdelivr.net/npm/marked@12.0.2/marked.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

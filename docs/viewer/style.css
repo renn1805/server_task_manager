@@ -1,0 +1,446 @@
+:root {
+    --bg: #fff;
+    --panel: #f6f7f9;
+    --text: #1f2328;
+    --muted: #656d76;
+    --line: #d8dee4;
+    --accent: #0969da;
+    --code: #eff1f3;
+    --ok: #1a7f37;
+    --warn: #9a6700;
+    --bad: #cf222e;
+    --pur: #8250df;
+    --sbw: 300px;
+}
+[data-theme="dark"] {
+    --bg: #0f1217;
+    --panel: #161b22;
+    --text: #e6edf3;
+    --muted: #8d96a0;
+    --line: #2d333b;
+    --accent: #58a6ff;
+    --code: #1f2630;
+    --ok: #3fb950;
+    --warn: #d29922;
+    --bad: #f85149;
+    --pur: #a371f7;
+}
+* {
+    box-sizing: border-box;
+}
+[hidden] {
+    display: none !important;
+}
+html {
+    scroll-behavior: smooth;
+}
+body {
+    margin: 0;
+    font:
+        16px/1.65 system-ui,
+        -apple-system,
+        "Segoe UI",
+        Roboto,
+        sans-serif;
+    background: var(--bg);
+    color: var(--text);
+}
+a {
+    color: var(--accent);
+}
+code,
+pre {
+    font-family: ui-monospace, SFMono-Regular, Consolas, Menlo, monospace;
+}
+button {
+    font: inherit;
+    font-size: 14px;
+    padding: 6px 12px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--text);
+    border-radius: 6px;
+    cursor: pointer;
+}
+button:hover {
+    border-color: var(--accent);
+}
+header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    height: 52px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 0 16px;
+    background: var(--panel);
+    border-bottom: 1px solid var(--line);
+}
+.brand {
+    font-weight: 700;
+    flex: 1;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.only-m {
+    display: none;
+}
+.muted {
+    color: var(--muted);
+}
+
+/* Mensagem de erro / aviso */
+#msg {
+    max-width: 640px;
+    margin: 60px auto;
+    padding: 24px 28px;
+    border: 1px solid var(--line);
+    border-radius: 12px;
+    background: var(--panel);
+}
+#msg h2 {
+    margin-top: 0;
+}
+
+/* Layout */
+#app {
+    display: grid;
+    grid-template-columns: var(--sbw) minmax(0, 1fr) 220px;
+    align-items: start;
+}
+#side {
+    position: sticky;
+    top: 52px;
+    height: calc(100vh - 52px);
+    overflow: auto;
+    padding: 14px;
+    border-right: 1px solid var(--line);
+    background: var(--panel);
+}
+main {
+    padding: 28px 40px 80px;
+    max-width: 920px;
+    width: 100%;
+    margin: 0 auto;
+}
+#toc {
+    position: sticky;
+    top: 52px;
+    max-height: calc(100vh - 52px);
+    overflow: auto;
+    padding: 28px 16px;
+    font-size: 13px;
+}
+#toc h4 {
+    margin: 0 0 8px;
+    color: var(--muted);
+    text-transform: uppercase;
+    font-size: 11px;
+    letter-spacing: 0.06em;
+}
+#toc a {
+    display: block;
+    padding: 2px 0;
+    color: var(--muted);
+    text-decoration: none;
+}
+#toc a:hover {
+    color: var(--accent);
+}
+#toc a.l3 {
+    padding-left: 12px;
+}
+
+/* Menu lateral */
+#q {
+    width: 100%;
+    padding: 8px 10px;
+    margin-bottom: 12px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--bg);
+    color: var(--text);
+    font: inherit;
+    font-size: 14px;
+}
+#tree ul,
+#results {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+#tree details ul {
+    padding-left: 14px;
+    border-left: 1px solid var(--line);
+    margin-left: 6px;
+}
+#tree li {
+    margin: 1px 0;
+}
+#tree summary {
+    cursor: pointer;
+    padding: 4px 6px;
+    border-radius: 6px;
+    font-weight: 600;
+    font-size: 14px;
+}
+#tree summary:hover,
+#tree a.f:hover {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+#tree a.f {
+    display: block;
+    padding: 4px 8px;
+    border-radius: 6px;
+    color: var(--text);
+    text-decoration: none;
+    font-size: 14px;
+}
+#tree a.f.active {
+    background: color-mix(in srgb, var(--accent) 18%, transparent);
+    color: var(--accent);
+    font-weight: 600;
+}
+#tree .empty {
+    padding: 2px 8px;
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+}
+#results a {
+    display: block;
+    padding: 8px;
+    border-radius: 6px;
+    text-decoration: none;
+    color: var(--text);
+    font-size: 14px;
+}
+#results a:hover {
+    background: color-mix(in srgb, var(--accent) 10%, transparent);
+}
+#results small {
+    display: block;
+    color: var(--muted);
+    font-size: 12px;
+}
+#results span {
+    display: block;
+    color: var(--muted);
+    font-size: 13px;
+}
+
+/* Conteúdo */
+.crumbs {
+    font-size: 13px;
+    color: var(--muted);
+    margin-bottom: 18px;
+}
+.crumbs a {
+    color: var(--muted);
+}
+.md h1,
+.md h2,
+.md h3,
+.md h4,
+.md h5,
+.md h6 {
+    scroll-margin-top: 70px;
+    line-height: 1.25;
+    margin: 1.6em 0 0.6em;
+}
+.md h1 {
+    font-size: 2em;
+    margin-top: 0;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--line);
+}
+.md h2 {
+    font-size: 1.5em;
+    padding-bottom: 0.3em;
+    border-bottom: 1px solid var(--line);
+}
+.md h3 {
+    font-size: 1.2em;
+}
+.md p,
+.md ul,
+.md ol,
+.md blockquote,
+.md pre,
+.md .tw,
+.md .codewrap {
+    margin: 0 0 1em;
+}
+.md li > p {
+    margin: 0.2em 0;
+}
+.md li:has(> input[type="checkbox"]) {
+    list-style: none;
+    margin-left: -1.3em;
+}
+.md li > input[type="checkbox"] {
+    margin-right: 0.5em;
+}
+.md code {
+    background: var(--code);
+    padding: 0.15em 0.4em;
+    border-radius: 5px;
+    font-size: 0.88em;
+}
+.md pre {
+    background: var(--code);
+    padding: 14px 16px;
+    border-radius: 8px;
+    overflow: auto;
+    line-height: 1.45;
+    margin: 0;
+}
+.md pre code,
+.md pre code.hljs {
+    background: none;
+    padding: 0;
+    font-size: 0.88em;
+}
+.codewrap {
+    position: relative;
+}
+.codewrap .copy {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    opacity: 0;
+    font-size: 12px;
+    padding: 2px 8px;
+    transition: opacity 0.15s;
+}
+.codewrap:hover .copy {
+    opacity: 1;
+}
+.md pre.mermaid {
+    background: none;
+    padding: 0;
+    text-align: center;
+    margin: 0 0 1em;
+}
+.mermaid-error {
+    border: 1px solid var(--bad);
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 1em;
+}
+.mermaid-error pre {
+    margin: 8px 0 0;
+}
+.md blockquote {
+    border-left: 4px solid var(--line);
+    padding: 0 1em;
+    color: var(--muted);
+}
+.md hr {
+    border: 0;
+    border-top: 1px solid var(--line);
+    margin: 2em 0;
+}
+.md img {
+    max-width: 100%;
+}
+.md .tw {
+    overflow-x: auto;
+}
+.md table {
+    border-collapse: collapse;
+    width: 100%;
+    font-size: 0.95em;
+}
+.md th,
+.md td {
+    border: 1px solid var(--line);
+    padding: 8px 12px;
+    text-align: left;
+    vertical-align: top;
+}
+.md th {
+    background: var(--panel);
+}
+.md tbody tr:nth-child(even) {
+    background: color-mix(in srgb, var(--panel) 60%, transparent);
+}
+.md a.broken {
+    color: var(--bad);
+    text-decoration: underline dashed;
+}
+.badge {
+    display: inline-block;
+    padding: 1px 10px;
+    border-radius: 999px;
+    font-size: 0.82em;
+    font-weight: 600;
+    border: 1px solid currentColor;
+    white-space: nowrap;
+}
+.b-planejado {
+    color: var(--muted);
+}
+.b-andamento {
+    color: var(--warn);
+}
+.b-pronto {
+    color: var(--ok);
+}
+.b-atual {
+    color: var(--accent);
+}
+.b-desejado {
+    color: var(--pur);
+}
+.b-pendente {
+    color: var(--bad);
+}
+.dirlist {
+    list-style: none;
+    padding: 0;
+}
+.dirlist li {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--line);
+}
+.dirlist small {
+    color: var(--muted);
+    margin-left: 8px;
+}
+
+/* Telas menores */
+@media (max-width: 1180px) {
+    #app {
+        grid-template-columns: var(--sbw) minmax(0, 1fr);
+    }
+    #toc {
+        display: none;
+    }
+}
+@media (max-width: 860px) {
+    .only-m {
+        display: inline-block;
+    }
+    #app {
+        grid-template-columns: minmax(0, 1fr);
+    }
+    #side {
+        position: fixed;
+        left: 0;
+        top: 52px;
+        width: min(var(--sbw), 85vw);
+        z-index: 15;
+        transform: translateX(-100%);
+        transition: transform 0.2s;
+    }
+    body.menu #side {
+        transform: none;
+        box-shadow: 0 0 30px rgba(0, 0, 0, 0.35);
+    }
+    main {
+        padding: 20px 16px 60px;
+    }
+}
